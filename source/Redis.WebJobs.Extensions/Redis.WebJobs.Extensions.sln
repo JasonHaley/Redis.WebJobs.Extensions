@@ -5,6 +5,12 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{35E3FDE8-5C63-42AD-A612-7B364D2260C2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{5F005379-A4B8-4CAB-8557-F55473E41B05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamplePublisher", "Samples\SamplePublisher\SamplePublisher.csproj", "{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleSubscriber", "Samples\SampleSubscriber\SampleSubscriber.csproj", "{5EFB00B7-8C3F-45EB-942D-596E3D2457F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +21,20 @@ Global
 		{35E3FDE8-5C63-42AD-A612-7B364D2260C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35E3FDE8-5C63-42AD-A612-7B364D2260C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E3FDE8-5C63-42AD-A612-7B364D2260C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EFB00B7-8C3F-45EB-942D-596E3D2457F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EFB00B7-8C3F-45EB-942D-596E3D2457F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EFB00B7-8C3F-45EB-942D-596E3D2457F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EFB00B7-8C3F-45EB-942D-596E3D2457F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{88310EE0-C9F0-4AE5-B1AA-795A0F215BBC} = {5F005379-A4B8-4CAB-8557-F55473E41B05}
+		{5EFB00B7-8C3F-45EB-942D-596E3D2457F0} = {5F005379-A4B8-4CAB-8557-F55473E41B05}
 	EndGlobalSection
 EndGlobal
