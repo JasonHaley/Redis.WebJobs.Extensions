@@ -17,9 +17,7 @@ namespace Redis.WebJobs.Extensions.Config
         }
 
         public RedisConfiguration()
-        {
-            ChannelMessageHandlerFactory = new DefaultChannelMessageHandlerFactory();
-        }
+        { }
 
         public string ConnectionString
         {
@@ -40,6 +38,5 @@ namespace Redis.WebJobs.Extensions.Config
             }
         }
         
-        public IChannelMessageHandlerFactory ChannelMessageHandlerFactory { get; set; }
     }
 }

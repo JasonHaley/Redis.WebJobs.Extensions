@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Redis.WebJobs.Extensions.Bindings
+namespace Redis.WebJobs.Extensions.Framework
 {
     internal interface IBindingDataProvider
     {

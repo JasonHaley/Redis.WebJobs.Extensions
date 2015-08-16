@@ -12,22 +12,22 @@ namespace Redis.WebJobs.Extensions.Listeners
     {
         private readonly RedisAccount _account;
         private readonly RedisConfiguration _config;
-        private readonly RedisPubSubTriggerExecutor _triggerExecutor;
+        private readonly ITriggeredFunctionExecutor _triggerExecutor;
         private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly ChannelMessageHandler _messageHandler;
+        private readonly MessageProcessor _messageProcessor;
         private readonly string _channelName;
 
         private MessageReceiver _receiver;
         private bool _disposed;
 
-        public RedisChannelListener(RedisAccount account, string channelName, RedisPubSubTriggerExecutor triggerExecutor, RedisConfiguration config)
+        public RedisChannelListener(RedisAccount account, string channelName, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config)
         {
             _account = account;
             _channelName = channelName;
             _triggerExecutor = triggerExecutor;
             _cancellationTokenSource = new CancellationTokenSource();
             _config = config;
-            _messageHandler = CreateMessageHandler(channelName, config);
+            _messageProcessor = CreateMessageProcessor(channelName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -101,20 +101,25 @@ namespace Redis.WebJobs.Extensions.Listeners
 
         internal async Task ProcessMessageAsync(string message, CancellationToken cancellationToken)
         {
-            if (!await _messageHandler.BeginMessageArrivedAsync(message, cancellationToken))
+            if (!await _messageProcessor.BeginMessageArrivedAsync(message, cancellationToken))
             {
                 return;
             }
 
-            FunctionResult result = await _triggerExecutor.ExecuteAsync(message, cancellationToken);
+            TriggeredFunctionData input = new TriggeredFunctionData
+            {
+                TriggerValue = message
+            };
 
-            await _messageHandler.EndMessageArrivedAsync(message, result, cancellationToken);
+            FunctionResult result = await _triggerExecutor.TryExecuteAsync(input, cancellationToken);
+
+            await _messageProcessor.EndMessageArrivedAsync(message, result, cancellationToken);
         }
 
-        private ChannelMessageHandler CreateMessageHandler(string channelName, RedisConfiguration config)
+        private MessageProcessor CreateMessageProcessor(string channelName)
         {
-            var context = new ChannelMessageHandlerFactoryContext(channelName);
-            return config.ChannelMessageHandlerFactory.Create(context);
+            var context = new MessageProcessorContext(channelName);
+            return new MessageProcessor(context);
         }
 
         private void ThrowIfDisposed()

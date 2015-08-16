@@ -43,7 +43,7 @@ namespace Redis.WebJobs.Extensions.Bindings
                 value = CreateEntity();
             }
 
-            return await BindAsync(value, context);
+            return await BindAsync((RedisPubSubEntity)value, context);
         }
 
         public ParameterDescriptor ToParameterDescriptor()

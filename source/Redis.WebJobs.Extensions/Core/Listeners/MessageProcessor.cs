@@ -5,9 +5,9 @@ using Microsoft.Azure.WebJobs.Host.Executors;
 
 namespace Redis.WebJobs.Extensions.Listeners
 {
-    public class ChannelMessageHandler
+    public class MessageProcessor
     {
-        public ChannelMessageHandler(ChannelMessageHandlerFactoryContext context)
+        public MessageProcessor(MessageProcessorContext context)
         {
             if (context == null)
             {

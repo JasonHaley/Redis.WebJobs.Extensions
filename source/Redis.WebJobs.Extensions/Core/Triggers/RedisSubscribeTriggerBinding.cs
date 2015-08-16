@@ -65,11 +65,9 @@ namespace Redis.WebJobs.Extensions.Triggers
             {
                 throw new ArgumentNullException("context");
             }
-
-            IListenerFactory factory = null;
-            factory = new RedisChannelListenerFactory(_account, _channelName, context.Executor, _config);
-                        
-            return factory.CreateAsync(context.CancellationToken);
+            
+            IListener listener = new RedisChannelListener(_account, _channelName, context.Executor, _config);
+            return Task.FromResult(listener);
         }
 
         public ParameterDescriptor ToParameterDescriptor()

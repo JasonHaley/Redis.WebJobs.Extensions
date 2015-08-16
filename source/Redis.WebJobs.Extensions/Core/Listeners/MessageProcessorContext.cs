@@ -2,9 +2,9 @@
 
 namespace Redis.WebJobs.Extensions.Listeners
 {
-    public class ChannelMessageHandlerFactoryContext
+    public class MessageProcessorContext
     {
-        public ChannelMessageHandlerFactoryContext(string channelName)
+        public MessageProcessorContext(string channelName)
         {
             if (string.IsNullOrEmpty(channelName))
             {

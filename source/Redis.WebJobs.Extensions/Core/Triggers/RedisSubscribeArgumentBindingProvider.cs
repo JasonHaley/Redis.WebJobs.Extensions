@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Newtonsoft.Json;
-using Redis.WebJobs.Extensions.Bindings;
+using Redis.WebJobs.Extensions.Framework;
 
 namespace Redis.WebJobs.Extensions.Triggers
 {
@@ -45,17 +45,10 @@ namespace Redis.WebJobs.Extensions.Triggers
             {
                 IValueProvider provider;
 
-                try
+                TInput contents;
+
+                if (TryJsonConvert(value, out contents))
                 {
-                    TInput contents = await GetBody(value, context);
-
-                    if (contents == null)
-                    {
-                        provider = await RedisPubSubMessageValueProvider.CreateAsync(value, null, ValueType,
-                            context.CancellationToken);
-                        return new TriggerData(provider, null);
-                    }
-
                     provider = await RedisPubSubMessageValueProvider.CreateAsync(value, contents, ValueType,
                         context.CancellationToken);
 
@@ -64,42 +57,34 @@ namespace Redis.WebJobs.Extensions.Triggers
 
                     return new TriggerData(provider, bindingData);
                 }
-                catch (Exception)
+                else
                 {
                     if (typeof(TInput) == typeof(string))
                     {
                         provider = await RedisPubSubMessageValueProvider.CreateAsync(value, value, ValueType,
                             context.CancellationToken);
-
-                        return new TriggerData(provider, null);
                     }
                     else
                     {
                         provider = await RedisPubSubMessageValueProvider.CreateAsync(value, null, ValueType,
                             context.CancellationToken);
-                        return new TriggerData(provider, null);
                     }
+                    return new TriggerData(provider, null);
                 }
 
             }
 
-            private static Task<TInput> GetBody(string message, ValueBindingContext context)
+            private bool TryJsonConvert(string message, out TInput contents)
             {
+                contents = default(TInput);
                 try
                 {
-                    return Task.FromResult(JsonConvert.DeserializeObject<TInput>(message, Constants.JsonSerializerSettings));
+                    contents = JsonConvert.DeserializeObject<TInput>(message, Constants.JsonSerializerSettings);
+                    return true;
                 }
                 catch (JsonException e)
                 {
-
-                    // Easy to have the queue payload not deserialize properly. So give a useful error. 
-                    string msg = string.Format(
-    @"Binding parameters to complex objects (such as '{0}') uses Json.NET serialization. 
-1. Bind the parameter type as 'string' instead of '{0}' to get the raw values and avoid JSON deserialization, or
-2. Change the queue payload to be valid json. The JSON parser failed: {1}
-", typeof(TInput).Name, e.Message);
-                    throw new InvalidOperationException(msg);
-
+                    return false;
                 }
             }
         }
