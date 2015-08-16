@@ -13,7 +13,7 @@ namespace Redis.WebJobs.Extensions.Triggers
 {
     public class RedisSubscribeTriggerAttributeBindingProvider : ITriggerBindingProvider
     {
-        private static readonly IPubSubTriggerArgumentBindingProvider InnerProvider = new UserTypeArgumentBindingProvider();
+        private static readonly RedisSubscribeArgumentBindingProvider _provider = new RedisSubscribeArgumentBindingProvider();
         private readonly RedisConfiguration _config;
         
         public RedisSubscribeTriggerAttributeBindingProvider(RedisConfiguration config)
@@ -40,7 +40,7 @@ namespace Redis.WebJobs.Extensions.Triggers
                 return Task.FromResult<ITriggerBinding>(null);
             }
                                     
-            ITriggerDataArgumentBinding<string> argumentBinding = InnerProvider.TryCreate(parameter);
+            ITriggerDataArgumentBinding<string> argumentBinding = _provider.TryCreate(parameter);
 
             if (argumentBinding == null)
             {

@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
-using Redis.WebJobs.Extensions.Converters;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
@@ -13,7 +12,7 @@ namespace Redis.WebJobs.Extensions.Bindings
         private readonly IArgumentBinding<RedisPubSubEntity> _argumentBinding;
         private readonly RedisAccount _account;
         private readonly string _channelName;
-        private readonly IAsyncObjectToTypeConverter<RedisPubSubEntity> _converter;
+        
         public RedisPublishBinding(string parameterName, IArgumentBinding<RedisPubSubEntity> argumentBinding,
             RedisAccount account, string channelName)
         {
@@ -21,7 +20,6 @@ namespace Redis.WebJobs.Extensions.Bindings
             _argumentBinding = argumentBinding;
             _account = account;
             _channelName = channelName;
-            _converter = CreateConverter(account, channelName);
         }
 
         public bool FromAttribute
@@ -33,25 +31,19 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            RedisPubSubEntity entity = new RedisPubSubEntity
-            {
-                Account = _account,
-                ChannelName = _channelName
-            };
+            var entity = CreateEntity();
 
             return BindAsync(entity, context.ValueContext);
         }
 
         public async Task<IValueProvider> BindAsync(object value, ValueBindingContext context)
         {
-            ConversionResult<RedisPubSubEntity> conversionResult = await _converter.TryConvertAsync(value, context.CancellationToken);
-
-            if (!conversionResult.Succeeded)
+            if (value == null)
             {
-                throw new InvalidOperationException("Unable to convert value to RedisPubSubEntity.");
+                value = CreateEntity();
             }
 
-            return await BindAsync(conversionResult.Result, context);
+            return await BindAsync(value, context);
         }
 
         public ParameterDescriptor ToParameterDescriptor()
@@ -69,11 +61,15 @@ namespace Redis.WebJobs.Extensions.Bindings
             return _argumentBinding.BindAsync(value, context);
         }
 
-        private static IAsyncObjectToTypeConverter<RedisPubSubEntity> CreateConverter(RedisAccount account, string channel)
+        private RedisPubSubEntity CreateEntity()
         {
-            return new OutputConverter<string>(new StringToRedisPubSubEntityConverter(account, channel));
+            return new RedisPubSubEntity
+            {
+                Account = _account,
+                ChannelName = _channelName
+            };
         }
-
+        
         internal static ParameterDisplayHints CreateParameterDisplayHints(string channelName, bool isInput)
         {
             ParameterDisplayHints descriptor = new ParameterDisplayHints();

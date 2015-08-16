@@ -8,25 +8,43 @@ namespace SampleSubscriber
     {
         public static void ReceiveSimpleMessage([RedisSubscribeTrigger("messages")] string message)
         {
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
+
             Console.WriteLine("Received Message: {0}", message);
+
+            Console.ForegroundColor = defaultColor;
         }
 
         public static void ReceiveMessage([RedisSubscribeTrigger("messages")] Message message, TextWriter log)
         {
-
+            string outMessage;
             if (message != null)
             {
-                log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+                outMessage = string.Format("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
             }
             else
             {
-                log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
+                outMessage = "***ReceivedMessage: message sent but not compatible withe Message type";
             }
+
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine(outMessage);
+
+            Console.ForegroundColor = defaultColor;
+
+            log.WriteLine(outMessage);
+
         }
 
         public static void ReceiveSimpleMessageWithWildcard([RedisSubscribeTrigger("messages:*")] string message)
         {
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Received Message: {0}", message);
+            Console.ForegroundColor = defaultColor;
         }
 
         public static void ReceiveMessageWithWildcard([RedisSubscribeTrigger("messages:*")] Message message, TextWriter log)

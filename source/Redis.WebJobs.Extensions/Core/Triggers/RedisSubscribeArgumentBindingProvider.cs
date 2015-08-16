@@ -9,7 +9,7 @@ using Redis.WebJobs.Extensions.Bindings;
 
 namespace Redis.WebJobs.Extensions.Triggers
 {
-    internal class UserTypeArgumentBindingProvider : IPubSubTriggerArgumentBindingProvider
+    internal class RedisSubscribeArgumentBindingProvider
     {
         public ITriggerDataArgumentBinding<string> TryCreate(ParameterInfo parameter)
         {
@@ -18,15 +18,15 @@ namespace Redis.WebJobs.Extensions.Triggers
 
         private static ITriggerDataArgumentBinding<string> CreateBinding(Type itemType)
         {
-            Type genericType = typeof(UserTypeArgumentBinding<>).MakeGenericType(itemType);
+            Type genericType = typeof(RedisSubscibeArgumentBinding<>).MakeGenericType(itemType);
             return (ITriggerDataArgumentBinding<string>)Activator.CreateInstance(genericType);
         }
 
-        private class UserTypeArgumentBinding<TInput> : ITriggerDataArgumentBinding<string>
+        private class RedisSubscibeArgumentBinding<TInput> : ITriggerDataArgumentBinding<string>
         {
             private readonly IBindingDataProvider _bindingDataProvider;
 
-            public UserTypeArgumentBinding()
+            public RedisSubscibeArgumentBinding()
             {
                 _bindingDataProvider = BindingDataProvider.FromType(typeof(TInput));
             }

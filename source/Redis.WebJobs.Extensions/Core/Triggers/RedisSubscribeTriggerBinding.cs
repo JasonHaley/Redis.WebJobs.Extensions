@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
@@ -7,7 +8,6 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Redis.WebJobs.Extensions.Bindings;
 using Redis.WebJobs.Extensions.Config;
-using Redis.WebJobs.Extensions.Converters;
 using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Triggers
@@ -15,7 +15,6 @@ namespace Redis.WebJobs.Extensions.Triggers
     internal class RedisSubscribeTriggerBinding : ITriggerBinding
     {
         private readonly string _parameterName;
-        private readonly IObjectToTypeConverter<string> _converter;
         private readonly ITriggerDataArgumentBinding<string> _argumentBinding;
         private readonly RedisAccount _account;
         private readonly string _channelName;
@@ -25,7 +24,6 @@ namespace Redis.WebJobs.Extensions.Triggers
             ITriggerDataArgumentBinding<string> argumentBinding, RedisAccount account, string channelName, RedisConfiguration config)
         {
             _parameterName = parameterName;
-            _converter = CreateConverter(parameterType);
             _argumentBinding = argumentBinding;
             _account = account;
             _channelName = channelName;
@@ -53,7 +51,7 @@ namespace Redis.WebJobs.Extensions.Triggers
         public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             string message = value as string;
-            if (message == null || !_converter.TryConvert(value, out message))
+            if (message == null)
             {
                 throw new InvalidOperationException("Unable to convert message.");
             }
@@ -83,12 +81,15 @@ namespace Redis.WebJobs.Extensions.Triggers
                 DisplayHints = RedisPublishBinding.CreateParameterDisplayHints(ChannelName, true)
             };
         }
-
-        private static IObjectToTypeConverter<string> CreateConverter(Type parameterType)
+        
+        private class RedisSubscribeTriggerParameterDescriptor : TriggerParameterDescriptor
         {
-            return new CompositeObjectToTypeConverter<string>(
-                    new OutputConverter<string>(new IdentityConverter<string>()),
-                    new OutputConverter<string>(StringToRedisPubSubMessageConverterFactory.Create(parameterType)));
+            public string ChannelName { get; set; }
+
+            public override string GetTriggerReason(IDictionary<string, string> arguments)
+            {
+                return string.Format(CultureInfo.CurrentCulture, "New message detected on '{0}'.", ChannelName);
+            }
         }
     }
 }

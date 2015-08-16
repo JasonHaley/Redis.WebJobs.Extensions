@@ -97,21 +97,12 @@
     <Compile Include="Triggers\PropertyHelper.cs" />
     <Compile Include="Bindings\RedisPublishAttributeBindingProvider.cs" />
     <Compile Include="Bindings\RedisPublishBinding.cs" />
-    <Compile Include="Bindings\RedisPubSubArgumentBinding.cs" />
+    <Compile Include="Bindings\RedisPubSubArgumentBindingProvider.cs" />
     <Compile Include="Bindings\RedisPubSubEntity.cs" />
     <Compile Include="Bindings\RedisPubSubValueBinder.cs" />
     <Compile Include="Config\RedisConfiguration.cs" />
     <Compile Include="Config\RedisExtensionConfig.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Converters\CompositeObjectToTypeConverter.cs" />
-    <Compile Include="Converters\ConversionResult.cs" />
-    <Compile Include="Converters\IAsyncConverter.cs" />
-    <Compile Include="Converters\IAsyncObjectToTypeConverter.cs" />
-    <Compile Include="Converters\IConverter.cs" />
-    <Compile Include="Converters\IdentityConverter.cs" />
-    <Compile Include="Converters\IObjectToTypeConverter.cs" />
-    <Compile Include="Converters\OutputConverter.cs" />
-    <Compile Include="Converters\StringToRedisPubSubEntityConverter.cs" />
     <Compile Include="Extensions\JobHostConfigurationExtensions.cs" />
     <Compile Include="Framework\JsonStringValueBinder.cs" />
     <Compile Include="Listeners\ChannelMessageHandler.cs" />
@@ -131,19 +122,11 @@
     <Compile Include="RedisPublishAttribute.cs" />
     <Compile Include="RedisPubSubMessage.cs" />
     <Compile Include="RedisSubscribeTriggerAttribute.cs" />
-    <Compile Include="Triggers\ConverterArgumentBindingProvider.cs" />
-    <Compile Include="Triggers\IPubSubTriggerArgumentBindingProvider.cs" />
     <Compile Include="Triggers\ITriggerDataArgumentBinding.cs" />
-    <Compile Include="Triggers\OutputConverter.cs" />
-    <Compile Include="Triggers\RedisPubSubMessageToStringConverter.cs" />
     <Compile Include="Triggers\RedisPubSubMessageValueProvider.cs" />
     <Compile Include="Triggers\RedisSubscribeTriggerAttributeBindingProvider.cs" />
     <Compile Include="Triggers\RedisSubscribeTriggerBinding.cs" />
-    <Compile Include="Triggers\RedisSubscribeTriggerParameterDescriptor.cs" />
-    <Compile Include="Triggers\StringToJsonRedisPubSubMessageConverter.cs" />
-    <Compile Include="Triggers\StringToRedisPubSubMessageConverterFactory.cs" />
-    <Compile Include="Triggers\StringToTextRedisPubSubMessageConverter.cs" />
-    <Compile Include="Triggers\UserTypeArgumentBindingProvider.cs" />
+    <Compile Include="Triggers\RedisSubscribeArgumentBindingProvider.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
