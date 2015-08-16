@@ -9,8 +9,7 @@ namespace Redis.WebJobs.Extensions.Bindings
 {
     public class RedisPublishAttributeBindingProvider : IBindingProvider
     {
-        private static readonly IPubSubArgumentBindingProvider InnerProvider =
-            new CompositeArgumentBindingProvider(new StringArgumentBindingProvider(), new UserTypeArgumentBindingProvider());
+        private static readonly RedisPubSubArgumentBindingProvider _provider = new RedisPubSubArgumentBindingProvider();
 
         private RedisConfiguration _config;
         public RedisPublishAttributeBindingProvider(RedisConfiguration config)
@@ -37,7 +36,7 @@ namespace Redis.WebJobs.Extensions.Bindings
                 return Task.FromResult<IBinding>(null);
             }
 
-            IArgumentBinding<RedisPubSubEntity> argumentBinding = InnerProvider.TryCreate(parameter);
+            IArgumentBinding<RedisPubSubEntity> argumentBinding = _provider.TryCreate(parameter);
 
             if (argumentBinding == null)
             {

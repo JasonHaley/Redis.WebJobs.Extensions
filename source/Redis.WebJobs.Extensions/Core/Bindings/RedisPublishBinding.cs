@@ -90,5 +90,10 @@ namespace Redis.WebJobs.Extensions.Bindings
 
             return descriptor;
         }
+
+        private class RedisPubSubParameterDescriptor : ParameterDescriptor
+        {
+            public string ChannelName { get; set; }
+        }
     }
 }
