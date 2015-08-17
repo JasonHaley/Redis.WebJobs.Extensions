@@ -92,6 +92,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bindings\RedisAddOrReplaceArgumentBindingProvider.cs" />
+    <Compile Include="Bindings\RedisAddOrReplaceBinding.cs" />
+    <Compile Include="Bindings\RedisAddOrReplaceAttributeBindingProvider.cs" />
+    <Compile Include="Bindings\RedisAddOrReplaceValueBinder.cs" />
+    <Compile Include="Bindings\RedisGetArgumentBindingProvider.cs" />
+    <Compile Include="Bindings\RedisGetAttributeBindingProvider.cs" />
+    <Compile Include="Bindings\RedisGetBinding.cs" />
+    <Compile Include="Bindings\RedisGetValueBinder.cs" />
+    <Compile Include="Bindings\RedisKeyEntity.cs" />
     <Compile Include="Bindings\RedisPublishAttributeBindingProvider.cs" />
     <Compile Include="Bindings\RedisPublishBinding.cs" />
     <Compile Include="Bindings\RedisPubSubArgumentBindingProvider.cs" />

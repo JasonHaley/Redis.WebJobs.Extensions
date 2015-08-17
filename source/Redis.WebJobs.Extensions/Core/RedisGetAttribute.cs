@@ -5,11 +5,11 @@ namespace Redis.WebJobs.Extensions
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class RedisGetAttribute : Attribute
     {
-        public RedisGetAttribute(string key)
+        public RedisGetAttribute(string keyName)
         {
-            Key = key;
+            KeyName = keyName;
         }
 
-        public string Key { get; private set; }
+        public string KeyName { get; private set; }
     }
 }

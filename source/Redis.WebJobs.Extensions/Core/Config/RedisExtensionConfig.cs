@@ -39,6 +39,12 @@ namespace Redis.WebJobs.Extensions.Config
 
             RedisPublishAttributeBindingProvider bindingProvider = new RedisPublishAttributeBindingProvider(_redisConfig);
             extensions.RegisterExtension<IBindingProvider>(bindingProvider);
+
+            RedisAddOrReplaceAttributeBindingProvider addOrReplaceBindingProvider = new RedisAddOrReplaceAttributeBindingProvider(_redisConfig);
+            extensions.RegisterExtension<IBindingProvider>(addOrReplaceBindingProvider);
+
+            RedisGetAttributeBindingProvider getBindingProvider = new RedisGetAttributeBindingProvider(_redisConfig);
+            extensions.RegisterExtension<IBindingProvider>(getBindingProvider);
         }
     }
 }

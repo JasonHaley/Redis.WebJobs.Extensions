@@ -5,9 +5,9 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
-    internal class RedisPubSubArgumentBindingProvider
+    internal class RedisAddOrReplaceArgumentBindingProvider
     {
-        public IArgumentBinding<RedisPubSubEntity> TryCreate(ParameterInfo parameter)
+        public IArgumentBinding<RedisKeyEntity> TryCreate(ParameterInfo parameter)
         {
             if (!parameter.IsOut)
             {
@@ -24,27 +24,27 @@ namespace Redis.WebJobs.Extensions.Bindings
             return CreateBinding(itemType);
         }
 
-        private static IArgumentBinding<RedisPubSubEntity> CreateBinding(Type itemType)
+        private static IArgumentBinding<RedisKeyEntity> CreateBinding(Type itemType)
         {
-            Type genericType = typeof(RedisPubSubArgumentBinding<>).MakeGenericType(itemType);
-            return (IArgumentBinding<RedisPubSubEntity>)Activator.CreateInstance(genericType);
+            Type genericType = typeof(RedisAddOrReplaceArgumentBinding<>).MakeGenericType(itemType);
+            return (IArgumentBinding<RedisKeyEntity>)Activator.CreateInstance(genericType);
         }
 
-        private class RedisPubSubArgumentBinding<TInput> : IArgumentBinding<RedisPubSubEntity>
+        private class RedisAddOrReplaceArgumentBinding<TInput> : IArgumentBinding<RedisKeyEntity>
         {
             public Type ValueType
             {
-                get { return typeof (TInput); }
+                get { return typeof(TInput); }
             }
 
-            public Task<IValueProvider> BindAsync(RedisPubSubEntity value, ValueBindingContext context)
+            public Task<IValueProvider> BindAsync(RedisKeyEntity value, ValueBindingContext context)
             {
                 if (context == null)
                 {
                     throw new ArgumentNullException("context");
                 }
 
-                IValueProvider provider = new RedisPubSubValueBinder<TInput>(value);
+                IValueProvider provider = new RedisAddOrReplaceValueBinder<TInput>(value);
 
                 return Task.FromResult(provider);
             }

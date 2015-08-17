@@ -5,20 +5,18 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
-    internal class RedisPublishBinding : IBinding
+    internal class RedisGetBinding : IBinding
     {
         private readonly string _parameterName;
-        private readonly IArgumentBinding<RedisPubSubEntity> _argumentBinding;
+        private readonly IArgumentBinding<RedisKeyEntity> _argumentBinding;
         private readonly RedisAccount _account;
-        private readonly string _channelName;
-        
-        public RedisPublishBinding(string parameterName, IArgumentBinding<RedisPubSubEntity> argumentBinding,
-            RedisAccount account, string channelName)
+        private readonly string _keyName;
+        public RedisGetBinding(string parameterName, IArgumentBinding<RedisKeyEntity> argumentBinding, RedisAccount account, string keyName)
         {
             _parameterName = parameterName;
             _argumentBinding = argumentBinding;
             _account = account;
-            _channelName = channelName;
+            _keyName = keyName;
         }
 
         public bool FromAttribute
@@ -42,53 +40,53 @@ namespace Redis.WebJobs.Extensions.Bindings
                 value = CreateEntity();
             }
 
-            return await BindAsync((RedisPubSubEntity)value, context);
+            return await BindAsync((RedisKeyEntity)value, context);
         }
 
         public ParameterDescriptor ToParameterDescriptor()
         {
-            return new RedisPubSubParameterDescriptor
+            return new RedisGetBinding.RedisKeyParameterDescriptor
             {
                 Name = _parameterName,
-                ChannelName = _channelName,
-                DisplayHints = CreateParameterDisplayHints(_channelName, false)
+                KeyName = _keyName,
+                DisplayHints = CreateParameterDisplayHints(_keyName, false)
             };
         }
 
-        private Task<IValueProvider> BindAsync(RedisPubSubEntity value, ValueBindingContext context)
+        private Task<IValueProvider> BindAsync(RedisKeyEntity value, ValueBindingContext context)
         {
             return _argumentBinding.BindAsync(value, context);
         }
 
-        private RedisPubSubEntity CreateEntity()
+        private RedisKeyEntity CreateEntity()
         {
-            return new RedisPubSubEntity
+            return new RedisKeyEntity
             {
                 Account = _account,
-                ChannelName = _channelName
+                KeyName = _keyName
             };
         }
-        
-        internal static ParameterDisplayHints CreateParameterDisplayHints(string channelName, bool isInput)
+
+        internal static ParameterDisplayHints CreateParameterDisplayHints(string keyName, bool isInput)
         {
             ParameterDisplayHints descriptor = new ParameterDisplayHints();
 
             descriptor.Description = isInput ?
-                string.Format(CultureInfo.CurrentCulture, "publish to channel '{0}'", channelName) :
-                string.Format(CultureInfo.CurrentCulture, "subscribe to channel '{0}'", channelName);
+                string.Format(CultureInfo.CurrentCulture, "set redis key value '{0}'", keyName) :
+                string.Format(CultureInfo.CurrentCulture, "get redis key value '{0}'", keyName);
 
             descriptor.Prompt = isInput ?
-                "Enter the message" :
-                "Enter the channel name";
+                "Enter the value" :
+                "Enter the key";
 
-            descriptor.DefaultValue = isInput ? null : channelName;
+            descriptor.DefaultValue = isInput ? null : keyName;
 
             return descriptor;
         }
 
-        private class RedisPubSubParameterDescriptor : ParameterDescriptor
+        private class RedisKeyParameterDescriptor : ParameterDescriptor
         {
-            public string ChannelName { get; set; }
+            public string KeyName { get; set; }
         }
     }
 }

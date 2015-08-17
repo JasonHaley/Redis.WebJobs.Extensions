@@ -16,7 +16,7 @@ namespace SamplePublisher
             JobHost host = new JobHost(config);
             host.Start();
 
-            host.Call(typeof(Functions).GetMethod("SendSimpleMessage"));
+            //host.Call(typeof(Functions).GetMethod("SendSimpleMessage"));
             host.Call(typeof(Functions).GetMethod("SendMessage"));
 
             Console.CancelKeyPress += (sender, e) =>
