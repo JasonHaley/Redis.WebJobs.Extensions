@@ -3,7 +3,7 @@ Utility extensions for using Redis in Azure WebJobs.
 
 Current implementation borrows heavily from the ServiceBus extensions in the Azure WebJobs SDK.  I'm slowly working on refactoring the implementation.
 
-Currently I have two extensions implemented:
+Currently I have four extensions implemented: RedisPublish, RedisSubscribe, RedisAddOrReplace, RedisGet.
 
 #RedisPublish
 A binding that will publish a message to a Redis Channel.
@@ -56,6 +56,52 @@ public static void ReceiveMessage([RedisSubscribeTrigger("messages")] Message me
   {
     log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
   }
+}
+```
+
+#RedisAddOrReplace
+A binding that will add or replace a value for a given key in redis.  If the object is not a string it needs to be Json serializable to be successfully stored.
+
+Example of putting a string into a redis cache:
+```
+public static void ReceiveAndStoreSimpleMessage([RedisSubscribeTrigger("messages")] string message,
+  [RedisAddOrReplace("LastSimpleMessage")] out string lastMessage, TextWriter log)
+{
+  lastMessage = message;
+  log.WriteLine("Last message received: " + message);
+  log.WriteLine("Storing with key: LastSimpleMessage");
+}
+```
+
+Example of putting an object into a redis cache:
+```
+public static void ReceiveAndStoreMessage([RedisSubscribeTrigger("messages")] Message message,
+  [RedisAddOrReplace("LastMessage")] out Message lastMessage, TextWriter log)
+{
+  lastMessage = message;
+  log.WriteLine("Last message id received: " + message.Id);
+  log.WriteLine("Storing with key: LastMessage");
+}
+```
+
+#RedisGet
+Retrieves a value from a redis cache.  If the value is not a string, it needs to be Json serializable.
+
+Example of retrieving a string value out of a redis cache:
+```
+public static void GetSimpleMessage([RedisSubscribeTrigger("messages")] string message, 
+  [RedisGet("LastSimpleMessage")] string lastMessage, TextWriter log)
+{
+  log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+}
+```
+
+Example of retrieving an object out of a redis cache:
+```
+public static void GetMessage([RedisSubscribeTrigger("messages")] string message, 
+  [RedisGet("LastMessage")] Message lastMessage, TextWriter log)
+{
+  log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 }
 ```
 
