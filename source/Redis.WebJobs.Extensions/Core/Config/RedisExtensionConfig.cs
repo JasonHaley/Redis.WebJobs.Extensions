@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
@@ -32,19 +33,11 @@ namespace Redis.WebJobs.Extensions.Config
                 throw new ArgumentNullException("context");
             }
 
-            IExtensionRegistry extensions = context.Config.GetService<IExtensionRegistry>();
-
-            RedisSubscribeTriggerAttributeBindingProvider triggerBindingProvider = new RedisSubscribeTriggerAttributeBindingProvider(_redisConfig);
-            extensions.RegisterExtension<ITriggerBindingProvider>(triggerBindingProvider);
-
-            RedisPublishAttributeBindingProvider bindingProvider = new RedisPublishAttributeBindingProvider(_redisConfig);
-            extensions.RegisterExtension<IBindingProvider>(bindingProvider);
-
-            RedisAddOrReplaceAttributeBindingProvider addOrReplaceBindingProvider = new RedisAddOrReplaceAttributeBindingProvider(_redisConfig);
-            extensions.RegisterExtension<IBindingProvider>(addOrReplaceBindingProvider);
-
-            RedisGetAttributeBindingProvider getBindingProvider = new RedisGetAttributeBindingProvider(_redisConfig);
-            extensions.RegisterExtension<IBindingProvider>(getBindingProvider);
+            context.Config.RegisterBindingExtensions(
+                new RedisSubscribeTriggerAttributeBindingProvider(_redisConfig),
+                new RedisPublishAttributeBindingProvider(_redisConfig),
+                new RedisAddOrReplaceAttributeBindingProvider(_redisConfig),
+                new RedisGetAttributeBindingProvider(_redisConfig));
         }
     }
 }

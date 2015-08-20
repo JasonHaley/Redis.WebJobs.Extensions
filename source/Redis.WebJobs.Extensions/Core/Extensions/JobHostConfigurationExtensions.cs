@@ -30,11 +30,7 @@ namespace Redis.WebJobs.Extensions
                 throw new ArgumentNullException("redisConfig");
             }
 
-            RedisExtensionConfig extensionConfig = new RedisExtensionConfig(redisConfig);
-
-            IExtensionRegistry extensions = config.GetService<IExtensionRegistry>();
-            extensions.RegisterExtension<IExtensionConfigProvider>(extensionConfig);
+            config.RegisterExtensionConfigProvider(new RedisExtensionConfig(redisConfig));
         }
-
     }
 }
