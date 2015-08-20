@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
@@ -8,28 +9,28 @@ using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
 using Redis.WebJobs.Extensions.Bindings;
 using Redis.WebJobs.Extensions.Config;
+using Redis.WebJobs.Extensions.Framework;
 using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Triggers
 {
     internal class RedisSubscribeTriggerBinding : ITriggerBinding
     {
-        private readonly string _parameterName;
-        private readonly ITriggerDataArgumentBinding<string> _argumentBinding;
+        private readonly ParameterInfo _parameter;
+        private readonly IBindingDataProvider _bindingDataProvider;
         private readonly RedisAccount _account;
         private readonly string _channelName;
         private readonly RedisConfiguration _config;
 
-        public RedisSubscribeTriggerBinding(string parameterName, Type parameterType,
-            ITriggerDataArgumentBinding<string> argumentBinding, RedisAccount account, string channelName, RedisConfiguration config)
+        public RedisSubscribeTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelName, RedisConfiguration config)
         {
-            _parameterName = parameterName;
-            _argumentBinding = argumentBinding;
+            _parameter = parameter;
             _account = account;
             _channelName = channelName;
             _config = config;
+            _bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
         }
-
+        
         public Type TriggerValueType
         {
             get
@@ -40,7 +41,7 @@ namespace Redis.WebJobs.Extensions.Triggers
 
         public IReadOnlyDictionary<string, Type> BindingDataContract
         {
-            get { return _argumentBinding.BindingDataContract; }
+            get { return _bindingDataProvider != null ? _bindingDataProvider.Contract : null; }
         }
 
         public string ChannelName
@@ -50,15 +51,14 @@ namespace Redis.WebJobs.Extensions.Triggers
         
         public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            string message = value as string;
-            if (message == null)
-            {
-                throw new InvalidOperationException("Unable to convert message.");
-            }
+            IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
 
-            return await _argumentBinding.BindAsync(message, context);
+            IReadOnlyDictionary<string, object> bindingData = (_bindingDataProvider != null)
+                ? _bindingDataProvider.GetBindingData(provider.GetValue()) : null;
+
+            return new TriggerData(provider, bindingData);
         }
-
+        
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
             if (context == null)
@@ -74,7 +74,7 @@ namespace Redis.WebJobs.Extensions.Triggers
         {
             return new RedisSubscribeTriggerParameterDescriptor
             {
-                Name = _parameterName,
+                Name = _parameter.Name,
                 ChannelName = _channelName,
                 DisplayHints = RedisPublishBinding.CreateParameterDisplayHints(ChannelName, true)
             };

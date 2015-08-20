@@ -6,38 +6,38 @@ namespace SampleSubscriber
 {
     public static class Functions
     {
-        //public static void ReceiveSimpleMessage([RedisSubscribeTrigger("messages")] string message)
-        //{
-        //    var defaultColor = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.Blue;
+        public static void ReceiveSimpleMessage([RedisSubscribeTrigger("messages")] string message)
+        {
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
 
-        //    Console.WriteLine("Received Message: {0}", message);
+            Console.WriteLine("Received Message: {0}", message);
 
-        //    Console.ForegroundColor = defaultColor;
-        //}
+            Console.ForegroundColor = defaultColor;
+        }
 
-        //public static void ReceiveMessage([RedisSubscribeTrigger("messages")] Message message, TextWriter log)
-        //{
-        //    string outMessage;
-        //    if (message != null)
-        //    {
-        //        outMessage = string.Format("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
-        //    }
-        //    else
-        //    {
-        //        outMessage = "***ReceivedMessage: message sent but not compatible withe Message type";
-        //    }
+        public static void ReceiveMessage([RedisSubscribeTrigger("messages")] Message message, TextWriter log)
+        {
+            string outMessage;
+            if (message != null)
+            {
+                outMessage = string.Format("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+            }
+            else
+            {
+                outMessage = "***ReceivedMessage: message sent but not compatible withe Message type";
+            }
 
-        //    var defaultColor = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.Blue;
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
 
-        //    Console.WriteLine(outMessage);
+            Console.WriteLine(outMessage);
 
-        //    Console.ForegroundColor = defaultColor;
+            Console.ForegroundColor = defaultColor;
 
-        //    log.WriteLine(outMessage);
+            log.WriteLine(outMessage);
 
-        //}
+        }
 
         //public static void ReceiveSimpleMessageWithWildcard([RedisSubscribeTrigger("messages:*")] string message)
         //{
@@ -77,24 +77,24 @@ namespace SampleSubscriber
         //    Console.ForegroundColor = defaultColor;
         //}
 
-        public static void ReceiveAndStoreMessage([RedisSubscribeTrigger("messages")] Message message,
-            [RedisAddOrReplace("LastMessage")] out Message lastMessage, TextWriter log)
-        {
-            lastMessage = message;
+        //public static void ReceiveAndStoreMessage([RedisSubscribeTrigger("messages")] Message message,
+        //    [RedisAddOrReplace("LastMessage")] out Message lastMessage, TextWriter log)
+        //{
+        //    lastMessage = message;
 
-            log.WriteLine("Last message id received: " + message.Id);
-            log.WriteLine("Storing with key: LastMessage");
+        //    log.WriteLine("Last message id received: " + message.Id);
+        //    log.WriteLine("Storing with key: LastMessage");
 
-            // ------------------------------------------------------------------------
-            var defaultColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Blue;
+        //    // ------------------------------------------------------------------------
+        //    var defaultColor = Console.ForegroundColor;
+        //    Console.ForegroundColor = ConsoleColor.Blue;
 
-            Console.WriteLine("Last message received: " + message.Id);
-            Console.WriteLine("Storing with key: LastMessage");
+        //    Console.WriteLine("Last message received: " + message.Id);
+        //    Console.WriteLine("Storing with key: LastMessage");
 
-            Console.ForegroundColor = defaultColor;
-            // ------------------------------------------------------------------------
-        }
+        //    Console.ForegroundColor = defaultColor;
+        //    // ------------------------------------------------------------------------
+        //}
 
         //public static void ReceiveAndStoreMessageWithDynamicKey([RedisSubscribeTrigger("messages")] Message message,
         //    [RedisAddOrReplace("Messages:{Id}")] out Message lastMessage, TextWriter log)
@@ -117,19 +117,19 @@ namespace SampleSubscriber
         //    Console.ForegroundColor = defaultColor;
         //}
 
-        public static void GetMessage([RedisSubscribeTrigger("messages")] string message, [RedisGet("LastMessage")] Message lastMessage, TextWriter log)
-        {
-            log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+        //public static void GetMessage([RedisSubscribeTrigger("messages")] string message, [RedisGet("LastMessage")] Message lastMessage, TextWriter log)
+        //{
+        //    log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 
-            // ------------------------------------------------------------------------
-            var defaultColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Blue;
+        //    // ------------------------------------------------------------------------
+        //    var defaultColor = Console.ForegroundColor;
+        //    Console.ForegroundColor = ConsoleColor.Blue;
 
-            Console.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+        //    Console.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 
-            Console.ForegroundColor = defaultColor;
-            // ------------------------------------------------------------------------
-        }
+        //    Console.ForegroundColor = defaultColor;
+        //    // ------------------------------------------------------------------------
+        //}
     }
 
     public class Message

@@ -41,7 +41,6 @@ namespace Redis.WebJobs.Extensions.Framework
             return JsonConvert.SerializeObject(input, Constants.JsonSerializerSettings);
         }
         
-        // TODO: Duplicate method find better home for it
         protected bool TryJsonConvert(string message, out TInput contents)
         {
             contents = default(TInput);

@@ -111,6 +111,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions\JobHostConfigurationExtensions.cs" />
     <Compile Include="Framework\JsonStringValueBinder.cs" />
+    <Compile Include="Framework\JsonValueProvider.cs" />
     <Compile Include="Listeners\MessageProcessor.cs" />
     <Compile Include="Listeners\MessageProcessorContext.cs" />
     <Compile Include="Listeners\MessageReceiver.cs" />
@@ -125,12 +126,9 @@
     <Compile Include="RedisSubscribeTriggerAttribute.cs" />
     <Compile Include="Framework\BindingDataProvider.cs" />
     <Compile Include="Framework\IBindingDataProvider.cs" />
-    <Compile Include="Triggers\ITriggerDataArgumentBinding.cs" />
     <Compile Include="Framework\PropertyHelper.cs" />
-    <Compile Include="Triggers\RedisPubSubMessageValueProvider.cs" />
     <Compile Include="Triggers\RedisSubscribeTriggerAttributeBindingProvider.cs" />
     <Compile Include="Triggers\RedisSubscribeTriggerBinding.cs" />
-    <Compile Include="Triggers\RedisSubscribeArgumentBindingProvider.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

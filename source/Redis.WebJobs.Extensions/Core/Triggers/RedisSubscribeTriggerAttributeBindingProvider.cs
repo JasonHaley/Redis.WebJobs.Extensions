@@ -13,7 +13,6 @@ namespace Redis.WebJobs.Extensions.Triggers
 {
     public class RedisSubscribeTriggerAttributeBindingProvider : ITriggerBindingProvider
     {
-        private static readonly RedisSubscribeArgumentBindingProvider _provider = new RedisSubscribeArgumentBindingProvider();
         private readonly RedisConfiguration _config;
         
         public RedisSubscribeTriggerAttributeBindingProvider(RedisConfiguration config)
@@ -39,21 +38,11 @@ namespace Redis.WebJobs.Extensions.Triggers
             {
                 return Task.FromResult<ITriggerBinding>(null);
             }
-                                    
-            ITriggerDataArgumentBinding<string> argumentBinding = _provider.TryCreate(parameter);
-
-            if (argumentBinding == null)
-            {
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Can't bind to type '{0}'.", parameter.ParameterType));
-            }
-
+            
             RedisAccount account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);
-            ITriggerBinding binding;
-
-            binding = new RedisSubscribeTriggerBinding(parameter.Name, parameter.ParameterType, argumentBinding, account, attribute.ChannelName, _config);
+            ITriggerBinding binding = new RedisSubscribeTriggerBinding(parameter, account, attribute.ChannelName, _config);
             
             return Task.FromResult(binding);
         }
-
     }
 }
