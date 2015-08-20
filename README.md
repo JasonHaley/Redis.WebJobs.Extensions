@@ -3,14 +3,14 @@ Utility extensions for using Redis in Azure WebJobs.
 
 Current implementation borrows heavily from the ServiceBus extensions in the Azure WebJobs SDK.  I'm slowly working on refactoring the implementation.
 
-Currently I have four extensions implemented: RedisPublish, RedisSubscribe, RedisAddOrReplace, RedisGet.
+There are two bindings: Redis and RedisTrigger.
 
-#RedisPublish
+#Redis
 A binding that will publish a message to a Redis Channel.
 
 Example of sending a string message
 ```
-public static void SendSimpleMessage([RedisPublish("messages")] out string message, TextWriter log)
+public static void SendSimpleMessage([Redis("messages", Mode.PubSub)] out string message, TextWriter log)
 {
   message = "this is a test";
 
@@ -20,7 +20,7 @@ public static void SendSimpleMessage([RedisPublish("messages")] out string messa
 
 Exmple of sending an object that can be serialized with the Newtonsoft.Json serializer.
 ```
-public static void SendMessage([RedisPublish("messages")] out Message message, TextWriter log)
+public static void SendMessage([Redis("messages", Mode.PubSub)] out Message message, TextWriter log)
 {
   message = new Message
   {
@@ -33,39 +33,10 @@ public static void SendMessage([RedisPublish("messages")] out Message message, T
 }
 ```
 
-#RedisSubscribeTrigger
-A trigger that subscribes to a Redis Channel, passing in messages as they are published.
-
-Example of receiving string messages
-```
-public static void ReceiveSimpleMessage([RedisSubscribeTrigger("messages")] string message)
-{
-    Console.WriteLine("Received Message: {0}", message);
-}
-```
-
-Example of receiving serialized json objects in message
-```
-public static void ReceiveMessage([RedisSubscribeTrigger("messages")] Message message, TextWriter log)
-{
-  if (message != null)
-  {
-    log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
-  }
-  else
-  {
-    log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
-  }
-}
-```
-
-#RedisAddOrReplace
-A binding that will add or replace a value for a given key in redis.  If the object is not a string it needs to be Json serializable to be successfully stored.
-
 Example of putting a string into a redis cache:
 ```
-public static void ReceiveAndStoreSimpleMessage([RedisSubscribeTrigger("messages")] string message,
-  [RedisAddOrReplace("LastSimpleMessage")] out string lastMessage, TextWriter log)
+public static void ReceiveAndStoreSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message,
+  [Redis("LastSimpleMessage", Mode.Cache)] out string lastMessage, TextWriter log)
 {
   lastMessage = message;
   log.WriteLine("Last message received: " + message);
@@ -75,8 +46,8 @@ public static void ReceiveAndStoreSimpleMessage([RedisSubscribeTrigger("messages
 
 Example of putting an object into a redis cache:
 ```
-public static void ReceiveAndStoreMessage([RedisSubscribeTrigger("messages")] Message message,
-  [RedisAddOrReplace("LastMessage")] out Message lastMessage, TextWriter log)
+public static void ReceiveAndStoreMessage([RedisTrigger("messages", Mode.PubSub)] Message message,
+  [Redis("LastMessage", Mode.Cache)] out Message lastMessage, TextWriter log)
 {
   lastMessage = message;
   log.WriteLine("Last message id received: " + message.Id);
@@ -84,13 +55,10 @@ public static void ReceiveAndStoreMessage([RedisSubscribeTrigger("messages")] Me
 }
 ```
 
-#RedisGet
-Retrieves a value from a redis cache.  If the value is not a string, it needs to be Json serializable.
-
 Example of retrieving a string value out of a redis cache:
 ```
-public static void GetSimpleMessage([RedisSubscribeTrigger("messages")] string message, 
-  [RedisGet("LastSimpleMessage")] string lastMessage, TextWriter log)
+public static void GetSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message, 
+  [Redis("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
 {
   log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
 }
@@ -98,10 +66,36 @@ public static void GetSimpleMessage([RedisSubscribeTrigger("messages")] string m
 
 Example of retrieving an object out of a redis cache:
 ```
-public static void GetMessage([RedisSubscribeTrigger("messages")] string message, 
-  [RedisGet("LastMessage")] Message lastMessage, TextWriter log)
+public static void GetMessage([RedisTrigger("messages", Mode.PubSub)] string message, 
+  [Redis("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
 {
   log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+}
+```
+
+#RedisTrigger
+A trigger that subscribes to a Redis Channel, passing in messages as they are published.
+
+Example of receiving string messages
+```
+public static void ReceiveSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message)
+{
+    Console.WriteLine("Received Message: {0}", message);
+}
+```
+
+Example of receiving serialized json objects in message
+```
+public static void ReceiveMessage([RedisTrigger("messages", Mode.PubSub)] Message message, TextWriter log)
+{
+  if (message != null)
+  {
+    log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+  }
+  else
+  {
+    log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
+  }
 }
 ```
 
