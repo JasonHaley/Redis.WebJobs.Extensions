@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Redis.WebJobs.Extensions.Listeners;
 
@@ -38,5 +39,7 @@ namespace Redis.WebJobs.Extensions.Config
             }
         }
         
+
+        public TimeSpan? CheckCacheFrequency { get; set; }
     }
 }

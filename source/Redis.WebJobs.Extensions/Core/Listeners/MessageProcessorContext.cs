@@ -4,16 +4,16 @@ namespace Redis.WebJobs.Extensions.Listeners
 {
     public class MessageProcessorContext
     {
-        public MessageProcessorContext(string channelName)
+        public MessageProcessorContext(string channelOrKey)
         {
-            if (string.IsNullOrEmpty(channelName))
+            if (string.IsNullOrEmpty(channelOrKey))
             {
-                throw new ArgumentNullException("channelName");
+                throw new ArgumentNullException("channelOrKey");
             }
 
-            ChannelName = channelName;
+            ChannelOrKey = channelOrKey;
         }
 
-        public string ChannelName { get; private set; }
+        public string ChannelOrKey { get; private set; }
     }
 }

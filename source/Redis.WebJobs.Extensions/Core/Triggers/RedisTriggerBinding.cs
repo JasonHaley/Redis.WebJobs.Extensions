@@ -14,19 +14,21 @@ using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Triggers
 {
-    internal class RedisSubscribeTriggerBinding : ITriggerBinding
+    internal class RedisTriggerBinding : ITriggerBinding
     {
         private readonly ParameterInfo _parameter;
         private readonly IBindingDataProvider _bindingDataProvider;
         private readonly RedisAccount _account;
-        private readonly string _channelName;
+        private readonly string _channelOrKey;
+        private readonly Mode _mode;
         private readonly RedisConfiguration _config;
 
-        public RedisSubscribeTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelName, RedisConfiguration config)
+        public RedisTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelOrKey, Mode mode, RedisConfiguration config)
         {
             _parameter = parameter;
             _account = account;
-            _channelName = channelName;
+            _channelOrKey = channelOrKey;
+            _mode = mode;
             _config = config;
             _bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
         }
@@ -44,11 +46,15 @@ namespace Redis.WebJobs.Extensions.Triggers
             get { return _bindingDataProvider != null ? _bindingDataProvider.Contract : null; }
         }
 
-        public string ChannelName
+        public string ChannelOrKey
         {
-            get { return _channelName; }
+            get { return _channelOrKey; }
         }
-        
+        public Mode Mode
+        {
+            get { return _mode; }
+        }
+
         public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
@@ -66,27 +72,30 @@ namespace Redis.WebJobs.Extensions.Triggers
                 throw new ArgumentNullException("context");
             }
             
-            IListener listener = new RedisChannelListener(_account, _channelName, context.Executor, _config);
+            IListener listener = new RedisChannelListener(_account, _channelOrKey,_mode, context.Executor, _config);
             return Task.FromResult(listener);
         }
 
         public ParameterDescriptor ToParameterDescriptor()
         {
-            return new RedisSubscribeTriggerParameterDescriptor
+            return new RedisTriggerParameterDescriptor
             {
                 Name = _parameter.Name,
-                ChannelName = _channelName,
-                DisplayHints = RedisPublishBinding.CreateParameterDisplayHints(ChannelName, true)
+                ChannelOrKey = _channelOrKey,
+                Mode = _mode,
+                DisplayHints = RedisBinding.CreateParameterDisplayHints(ChannelOrKey, Mode, true)
             };
         }
         
-        private class RedisSubscribeTriggerParameterDescriptor : TriggerParameterDescriptor
+        private class RedisTriggerParameterDescriptor : TriggerParameterDescriptor
         {
-            public string ChannelName { get; set; }
+            public string ChannelOrKey { get; set; }
+            public Mode Mode { get; set; }
 
             public override string GetTriggerReason(IDictionary<string, string> arguments)
             {
-                return string.Format(CultureInfo.CurrentCulture, "New message detected on '{0}'.", ChannelName);
+                return string.Format(CultureInfo.CurrentCulture, 
+                    (Mode == Mode.PubSub) ? "New message detected on '{0}'." : "New value found at '{0}'", ChannelOrKey);
             }
         }
     }

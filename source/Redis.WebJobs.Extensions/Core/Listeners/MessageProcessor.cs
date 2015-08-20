@@ -14,10 +14,10 @@ namespace Redis.WebJobs.Extensions.Listeners
                 throw new ArgumentNullException("context");
             }
 
-            ChannelName = context.ChannelName;
+            ChannelOrKey = context.ChannelOrKey;
         }
 
-        public string ChannelName { get; set; }
+        public string ChannelOrKey { get; set; }
 
         public virtual async Task<bool> BeginMessageArrivedAsync(string message, CancellationToken cancellationToken)
         {

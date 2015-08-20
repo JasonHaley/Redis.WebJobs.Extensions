@@ -7,12 +7,12 @@ using Redis.WebJobs.Extensions.Config;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
-    public class RedisPublishAttributeBindingProvider : IBindingProvider
+    public class RedisAttributeBindingProvider : IBindingProvider
     {
-        private static readonly RedisPubSubArgumentBindingProvider _provider = new RedisPubSubArgumentBindingProvider();
+        private static readonly RedisArgumentBindingProvider _provider = new RedisArgumentBindingProvider();
 
         private RedisConfiguration _config;
-        public RedisPublishAttributeBindingProvider(RedisConfiguration config)
+        public RedisAttributeBindingProvider(RedisConfiguration config)
         {
             if (config == null)
             {
@@ -29,14 +29,14 @@ namespace Redis.WebJobs.Extensions.Bindings
             }
 
             ParameterInfo parameter = context.Parameter;
-            RedisPublishAttribute attribute = parameter.GetCustomAttribute<RedisPublishAttribute>(inherit: false);
+            RedisAttribute attribute = parameter.GetCustomAttribute<RedisAttribute>(inherit: false);
 
             if (attribute == null)
             {
                 return Task.FromResult<IBinding>(null);
             }
 
-            IArgumentBinding<RedisPubSubEntity> argumentBinding = _provider.TryCreate(parameter);
+            IArgumentBinding<RedisEntity> argumentBinding = _provider.TryCreate(parameter);
 
             if (argumentBinding == null)
             {
@@ -46,8 +46,7 @@ namespace Redis.WebJobs.Extensions.Bindings
 
             var account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);
 
-            IBinding binding = new RedisPublishBinding(parameter.Name, argumentBinding, account,
-                attribute.ChannelName);
+            IBinding binding = new RedisBinding(parameter.Name, argumentBinding, account, attribute.ChannelOrKey, attribute.Mode);
 
             return Task.FromResult(binding);
         }

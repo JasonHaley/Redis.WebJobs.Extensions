@@ -5,11 +5,11 @@ using Redis.WebJobs.Extensions.Framework;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
-    internal class RedisPubSubValueBinder<TInput> : JsonStringValueBinder<TInput>
+    internal class RedisValueBinder<TInput> : JsonStringValueBinder<TInput>
     {
-        private readonly RedisPubSubEntity _entity;
+        private readonly RedisEntity _entity;
 
-        public RedisPubSubValueBinder(RedisPubSubEntity entity) 
+        public RedisValueBinder(RedisEntity entity) 
             : base(BindStepOrder.Enqueue)
         {
             _entity = entity;
@@ -17,12 +17,27 @@ namespace Redis.WebJobs.Extensions.Bindings
 
         public override object GetValue()
         {
-            return default(TInput);
+            string value = _entity.GetAsync().Result;
+
+            if (value == null)
+            {
+                return default(TInput);
+            }
+
+            TInput contents;
+            if (TryJsonConvert(value, out contents))
+            {
+                return contents;
+            }
+            else
+            {
+                return value;
+            }
         }
 
         public override string ToInvokeString()
         {
-            return _entity.ChannelName;
+            return _entity.ChannelOrKey;
         }
 
         public override Task SetValueAsync(object value, CancellationToken cancellationToken)
@@ -37,7 +52,14 @@ namespace Redis.WebJobs.Extensions.Bindings
                 message = ConvertToJson((TInput) value);
             }
 
-            return _entity.SendAsync(message);
+            if (_entity.Mode == Mode.PubSub)
+            {
+                return _entity.SendAsync(message);
+            }
+            else
+            {
+                return _entity.SetAsync(message);
+            }
         }
         
     }

@@ -15,19 +15,22 @@ namespace Redis.WebJobs.Extensions.Listeners
         private readonly ITriggeredFunctionExecutor _triggerExecutor;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly MessageProcessor _messageProcessor;
-        private readonly string _channelName;
+        private readonly string _channelOrKey;
+        private readonly Mode _mode;
 
         private MessageReceiver _receiver;
         private bool _disposed;
 
-        public RedisChannelListener(RedisAccount account, string channelName, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config)
+        public RedisChannelListener(RedisAccount account, string channelOrKey, Mode mode, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config)
         {
             _account = account;
-            _channelName = channelName;
+            _channelOrKey = channelOrKey;
+            _mode = mode;
             _triggerExecutor = triggerExecutor;
             _cancellationTokenSource = new CancellationTokenSource();
             _config = config;
-            _messageProcessor = CreateMessageProcessor(channelName);
+
+            _messageProcessor = CreateMessageProcessor(channelOrKey);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -46,7 +49,7 @@ namespace Redis.WebJobs.Extensions.Listeners
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            _receiver = new MessageReceiver(_config, _channelName);
+            _receiver = new MessageReceiver(_config, _channelOrKey);
             await _receiver.OnMessageAsync(ProcessMessageAsync);
         }
 

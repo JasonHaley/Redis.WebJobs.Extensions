@@ -20,8 +20,10 @@ namespace SamplePublisher
             // Give subscriber chance to startup
             Task.Delay(5000).Wait();
 
-            host.Call(typeof(Functions).GetMethod("SendSimpleMessage"));
-            host.Call(typeof(Functions).GetMethod("SendMessage"));
+            host.Call(typeof(Functions).GetMethod("SendSimplePubSubMessage"));
+            host.Call(typeof(Functions).GetMethod("SendPubSubMessage"));
+            host.Call(typeof(Functions).GetMethod("AddSimpleCacheMessage"));
+            host.Call(typeof(Functions).GetMethod("AddCacheMessage"));
 
             Console.CancelKeyPress += (sender, e) =>
             {

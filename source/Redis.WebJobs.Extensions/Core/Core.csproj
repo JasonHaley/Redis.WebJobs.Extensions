@@ -92,20 +92,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bindings\RedisAddOrReplaceArgumentBindingProvider.cs" />
-    <Compile Include="Bindings\RedisAddOrReplaceBinding.cs" />
-    <Compile Include="Bindings\RedisAddOrReplaceAttributeBindingProvider.cs" />
-    <Compile Include="Bindings\RedisAddOrReplaceValueBinder.cs" />
-    <Compile Include="Bindings\RedisGetArgumentBindingProvider.cs" />
-    <Compile Include="Bindings\RedisGetAttributeBindingProvider.cs" />
-    <Compile Include="Bindings\RedisGetBinding.cs" />
-    <Compile Include="Bindings\RedisGetValueBinder.cs" />
-    <Compile Include="Bindings\RedisKeyEntity.cs" />
-    <Compile Include="Bindings\RedisPublishAttributeBindingProvider.cs" />
-    <Compile Include="Bindings\RedisPublishBinding.cs" />
-    <Compile Include="Bindings\RedisPubSubArgumentBindingProvider.cs" />
-    <Compile Include="Bindings\RedisPubSubEntity.cs" />
-    <Compile Include="Bindings\RedisPubSubValueBinder.cs" />
+    <Compile Include="Bindings\RedisAttributeBindingProvider.cs" />
+    <Compile Include="Bindings\RedisBinding.cs" />
+    <Compile Include="Bindings\RedisArgumentBindingProvider.cs" />
+    <Compile Include="Bindings\RedisEntity.cs" />
+    <Compile Include="Bindings\RedisValueBinder.cs" />
     <Compile Include="Config\RedisConfiguration.cs" />
     <Compile Include="Config\RedisExtensionConfig.cs" />
     <Compile Include="Constants.cs" />
@@ -118,17 +109,14 @@
     <Compile Include="Listeners\RedisChannelListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedisAccount.cs" />
-    <Compile Include="RedisAddOrReplaceAttribute.cs" />
+    <Compile Include="RedisTriggerAttribute.cs" />
     <Compile Include="RedisClient.cs" />
-    <Compile Include="RedisGetAttribute.cs" />
-    <Compile Include="RedisPublishAttribute.cs" />
-    <Compile Include="RedisPubSubMessage.cs" />
-    <Compile Include="RedisSubscribeTriggerAttribute.cs" />
+    <Compile Include="RedisAttribute.cs" />
     <Compile Include="Framework\BindingDataProvider.cs" />
     <Compile Include="Framework\IBindingDataProvider.cs" />
     <Compile Include="Framework\PropertyHelper.cs" />
-    <Compile Include="Triggers\RedisSubscribeTriggerAttributeBindingProvider.cs" />
-    <Compile Include="Triggers\RedisSubscribeTriggerBinding.cs" />
+    <Compile Include="Triggers\RedisTriggerAttributeBindingProvider.cs" />
+    <Compile Include="Triggers\RedisTriggerBinding.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
