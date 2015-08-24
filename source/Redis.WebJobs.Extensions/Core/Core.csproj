@@ -103,9 +103,12 @@
     <Compile Include="Extensions\JobHostConfigurationExtensions.cs" />
     <Compile Include="Framework\JsonStringValueBinder.cs" />
     <Compile Include="Framework\JsonValueProvider.cs" />
-    <Compile Include="Listeners\MessageProcessor.cs" />
-    <Compile Include="Listeners\MessageProcessorContext.cs" />
-    <Compile Include="Listeners\MessageReceiver.cs" />
+    <Compile Include="Framework\ListenerBase.cs" />
+    <Compile Include="Listeners\CacheReceiver.cs" />
+    <Compile Include="Listeners\RedisProcessor.cs" />
+    <Compile Include="Listeners\RedisProcessorContext.cs" />
+    <Compile Include="Listeners\PubSubReceiver.cs" />
+    <Compile Include="Listeners\RedisCacheListener.cs" />
     <Compile Include="Listeners\RedisChannelListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedisAccount.cs" />

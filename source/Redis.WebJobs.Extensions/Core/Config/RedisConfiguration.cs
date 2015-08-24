@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using Microsoft.Azure.WebJobs.Host.Executors;
-using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Config
 {
@@ -18,7 +16,10 @@ namespace Redis.WebJobs.Extensions.Config
         }
 
         public RedisConfiguration()
-        { }
+        {
+            LastValueKeyNamePrefix = "Previous_";
+            CheckCacheFrequency = TimeSpan.FromSeconds(30);
+        }
 
         public string ConnectionString
         {
@@ -41,5 +42,6 @@ namespace Redis.WebJobs.Extensions.Config
         
 
         public TimeSpan? CheckCacheFrequency { get; set; }
+        public string LastValueKeyNamePrefix { get; set; }
     }
 }

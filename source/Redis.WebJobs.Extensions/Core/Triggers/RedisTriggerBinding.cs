@@ -72,7 +72,16 @@ namespace Redis.WebJobs.Extensions.Triggers
                 throw new ArgumentNullException("context");
             }
             
-            IListener listener = new RedisChannelListener(_account, _channelOrKey,_mode, context.Executor, _config);
+            IListener listener;
+            
+            if (_mode == Mode.PubSub)
+            {
+                listener = new RedisChannelListener(_channelOrKey, context.Executor, _config);
+            }
+            else
+            {
+                listener = new RedisCacheListener(_channelOrKey, context.Executor, _config);
+            }
             return Task.FromResult(listener);
         }
 

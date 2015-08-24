@@ -1,5 +1,7 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System;
+using Microsoft.Azure.WebJobs;
 using Redis.WebJobs.Extensions;
+using Redis.WebJobs.Extensions.Config;
 
 namespace SampleSubscriber
 {

@@ -54,31 +54,31 @@ namespace SampleSubscriber
             // ------------------------------------------------------------------------
         }
 
-        //public static void GetCacheTriggerSimpleMessage([RedisTrigger("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
-        //{
-        //    log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+        public static void GetCacheTriggerSimpleMessage([RedisTrigger("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
+        {
+            log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
 
-        //    var defaultColor = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.Blue;
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
 
-        //    Console.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+            Console.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
 
-        //    Console.ForegroundColor = defaultColor;
-        //}
+            Console.ForegroundColor = defaultColor;
+        }
 
-        //public static void GetCacheTriggerMessage([RedisTrigger("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
-        //{
-        //    log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+        public static void GetCacheTriggerMessage([RedisTrigger("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
+        {
+            log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 
-        //    // ------------------------------------------------------------------------
-        //    var defaultColor = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.Blue;
+            // ------------------------------------------------------------------------
+            var defaultColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Blue;
 
-        //    Console.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+            Console.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 
-        //    Console.ForegroundColor = defaultColor;
-        //    // ------------------------------------------------------------------------
-        //}
+            Console.ForegroundColor = defaultColor;
+            // ------------------------------------------------------------------------
+        }
     }
 
     public class Message

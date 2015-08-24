@@ -5,9 +5,9 @@ using Microsoft.Azure.WebJobs.Host.Executors;
 
 namespace Redis.WebJobs.Extensions.Listeners
 {
-    public class MessageProcessor
+    public class RedisProcessor
     {
-        public MessageProcessor(MessageProcessorContext context)
+        public RedisProcessor(RedisProcessorContext context)
         {
             if (context == null)
             {

@@ -18,6 +18,19 @@ namespace Redis.WebJobs.Extensions
             config.UseRedis(new RedisConfiguration());
         }
 
+        public static void UseRedis(this JobHostConfiguration config, TimeSpan checkCacheFrequency)
+        {
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
+
+            var redisConfig = new RedisConfiguration();
+            redisConfig.CheckCacheFrequency = checkCacheFrequency;
+
+            config.UseRedis(redisConfig);
+        }
+
         public static void UseRedis(this JobHostConfiguration config, RedisConfiguration redisConfig)
         {
             if (config == null)
