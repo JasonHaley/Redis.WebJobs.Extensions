@@ -74,7 +74,9 @@ public static void GetMessage([RedisTrigger("messages", Mode.PubSub)] string mes
 ```
 
 #RedisTrigger
-A trigger that subscribes to a Redis Channel, passing in messages as they are published.
+This trigger has two modes: 
+PubSub - the trigger will subscribe to a Redis Channel, passing in messages as they are published.
+Cache - the trigger will check the value of a redis cache key on a determined TimeSpan frequency and compare the value to the previous checked value and will call function if values are different.  Uses a string compare on json serialized objects.
 
 Example of receiving string messages
 ```
