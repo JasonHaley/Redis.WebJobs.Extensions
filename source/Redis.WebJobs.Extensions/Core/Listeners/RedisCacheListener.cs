@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Redis.WebJobs.Extensions.Config;
 using Redis.WebJobs.Extensions.Framework;
@@ -18,9 +19,10 @@ namespace Redis.WebJobs.Extensions.Listeners
         private readonly string _lastValueKeyName;
         private Timer _timer;
         private TimeSpan _remainingInterval;
+        private readonly TraceWriter _trace;
 
         public RedisCacheListener(string channelOrKey, ITriggeredFunctionExecutor triggerExecutor,
-            RedisConfiguration config)
+            RedisConfiguration config, TraceWriter trace)
             : base()
         {
             _channelOrKey = channelOrKey;
@@ -28,6 +30,7 @@ namespace Redis.WebJobs.Extensions.Listeners
             _config = config;
             _lastValueKeyName = _config.LastValueKeyNamePrefix + channelOrKey;
             _redisProcessor = CreateProcessor(channelOrKey);
+            _trace = trace;
         }
         
         protected override void OnStarting()
@@ -177,12 +180,12 @@ namespace Redis.WebJobs.Extensions.Listeners
         private RedisProcessor CreateProcessor(string channelName)
         {
             var context = new RedisProcessorContext(channelName);
-            return new RedisProcessor(context);
+            return new RedisProcessor(context, _trace);
         }
 
-        private static CacheReceiver CreateReceiver(RedisConfiguration config, string channelOrKey, string lastValueKeyName)
+        private CacheReceiver CreateReceiver(RedisConfiguration config, string channelOrKey, string lastValueKeyName)
         {
-            return new CacheReceiver(config, channelOrKey, lastValueKeyName);
+            return new CacheReceiver(config, channelOrKey, lastValueKeyName, _trace);
         }
 
 

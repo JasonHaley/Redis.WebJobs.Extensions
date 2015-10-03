@@ -66,7 +66,7 @@ namespace Redis.WebJobs.Extensions.Framework
             {
                 return JsonConvert.DeserializeObject(message, _valueType, Constants.JsonSerializerSettings);
             }
-            catch (JsonException e)
+            catch (JsonException)
             {
                 return null;
             }

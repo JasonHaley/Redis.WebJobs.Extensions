@@ -49,6 +49,9 @@ namespace Redis.WebJobs.Extensions.Bindings
             }
             else
             {
+                // Pass data to RedisEntity to bind the channel or key path
+                _entity.SetBindingData(value.GetType(), value);
+
                 message = ConvertToJson((TInput) value);
             }
 

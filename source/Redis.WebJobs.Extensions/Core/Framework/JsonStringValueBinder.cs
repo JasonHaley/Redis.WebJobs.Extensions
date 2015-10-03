@@ -49,7 +49,7 @@ namespace Redis.WebJobs.Extensions.Framework
                 contents = JsonConvert.DeserializeObject<TInput>(message, Constants.JsonSerializerSettings);
                 return true;
             }
-            catch (JsonException e)
+            catch (JsonException)
             {
                 return false;
             }

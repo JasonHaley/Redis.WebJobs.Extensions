@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Redis.WebJobs.Extensions.Config;
 
@@ -9,16 +10,23 @@ namespace Redis.WebJobs.Extensions.Bindings
 {
     public class RedisAttributeBindingProvider : IBindingProvider
     {
-        private static readonly RedisArgumentBindingProvider _provider = new RedisArgumentBindingProvider();
+        private static readonly RedisArgumentBindingProvider Provider = new RedisArgumentBindingProvider();
 
-        private RedisConfiguration _config;
-        public RedisAttributeBindingProvider(RedisConfiguration config)
+        private readonly RedisConfiguration _config;
+        private readonly TraceWriter _trace;
+        
+        public RedisAttributeBindingProvider(RedisConfiguration config, TraceWriter trace)
         {
             if (config == null)
             {
                 throw new ArgumentNullException("config");
             }
+            if (trace == null)
+            {
+                throw new ArgumentNullException("trace");
+            }
             _config = config;
+            _trace = trace;
         }
 
         public Task<IBinding> TryCreateAsync(BindingProviderContext context)
@@ -36,7 +44,7 @@ namespace Redis.WebJobs.Extensions.Bindings
                 return Task.FromResult<IBinding>(null);
             }
 
-            IArgumentBinding<RedisEntity> argumentBinding = _provider.TryCreate(parameter);
+            IArgumentBinding<RedisEntity> argumentBinding = Provider.TryCreate(parameter);
 
             if (argumentBinding == null)
             {
@@ -46,7 +54,7 @@ namespace Redis.WebJobs.Extensions.Bindings
 
             var account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);
 
-            IBinding binding = new RedisBinding(parameter.Name, argumentBinding, account, attribute.ChannelOrKey, attribute.Mode);
+            IBinding binding = new RedisBinding(parameter.Name, argumentBinding, account, attribute, context, _trace);
 
             return Task.FromResult(binding);
         }

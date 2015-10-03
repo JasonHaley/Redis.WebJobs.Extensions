@@ -1,7 +1,10 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
+using Microsoft.Azure.WebJobs.Extensions.Framework;
+using Microsoft.Azure.WebJobs.Host;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
@@ -10,17 +13,22 @@ namespace Redis.WebJobs.Extensions.Bindings
         private readonly string _parameterName;
         private readonly IArgumentBinding<RedisEntity> _argumentBinding;
         private readonly RedisAccount _account;
-        private readonly string _channelOrKey;
+        private readonly RedisAttribute _attribute;
+        private readonly BindablePath _channelOrKeyPath;
         private readonly Mode _mode;
-        
+        private readonly TraceWriter _trace;
+
         public RedisBinding(string parameterName, IArgumentBinding<RedisEntity> argumentBinding,
-            RedisAccount account, string channelOrKey, Mode mode)
+            RedisAccount account, RedisAttribute attribute, BindingProviderContext context, TraceWriter trace)
         {
             _parameterName = parameterName;
             _argumentBinding = argumentBinding;
             _account = account;
-            _channelOrKey = channelOrKey;
-            _mode = mode;
+            _attribute = attribute;
+            _mode = attribute.Mode;
+
+            _channelOrKeyPath = new BindablePath(attribute.ChannelOrKey);
+            _trace = trace;
         }
 
         public bool FromAttribute
@@ -32,7 +40,7 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var entity = CreateEntity();
+            var entity = CreateEntity(context.BindingData);
 
             return BindAsync(entity, context.ValueContext);
         }
@@ -41,7 +49,8 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             if (value == null)
             {
-                value = CreateEntity();
+                System.Diagnostics.Debugger.Break();
+                //value = CreateEntity();
             }
 
             return await BindAsync((RedisEntity)value, context);
@@ -52,9 +61,9 @@ namespace Redis.WebJobs.Extensions.Bindings
             return new RedisParameterDescriptor
             {
                 Name = _parameterName,
-                ChannelOrKey = _channelOrKey,
+                ChannelOrKey = _attribute.ChannelOrKey,
                 Mode = _mode,
-                DisplayHints = CreateParameterDisplayHints(_channelOrKey, _mode, false)
+                DisplayHints = CreateParameterDisplayHints(_attribute.ChannelOrKey, _mode, false)
             };
         }
 
@@ -63,14 +72,9 @@ namespace Redis.WebJobs.Extensions.Bindings
             return _argumentBinding.BindAsync(value, context);
         }
 
-        private RedisEntity CreateEntity()
+        private RedisEntity CreateEntity(IReadOnlyDictionary<string, object> bindingData)
         {
-            return new RedisEntity
-            {
-                Account = _account,
-                ChannelOrKey = _channelOrKey,
-                Mode = _mode
-            };
+            return new RedisEntity(_account, _channelOrKeyPath, _mode, bindingData);
         }
         
         internal static ParameterDisplayHints CreateParameterDisplayHints(string channelOrKey, Mode mode, bool isInput)

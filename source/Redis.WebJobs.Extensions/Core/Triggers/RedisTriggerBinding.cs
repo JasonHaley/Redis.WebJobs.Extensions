@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
@@ -22,8 +23,9 @@ namespace Redis.WebJobs.Extensions.Triggers
         private readonly string _channelOrKey;
         private readonly Mode _mode;
         private readonly RedisConfiguration _config;
+        private readonly TraceWriter _trace;
 
-        public RedisTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelOrKey, Mode mode, RedisConfiguration config)
+        public RedisTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelOrKey, Mode mode, RedisConfiguration config, TraceWriter trace)
         {
             _parameter = parameter;
             _account = account;
@@ -31,6 +33,7 @@ namespace Redis.WebJobs.Extensions.Triggers
             _mode = mode;
             _config = config;
             _bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
+            _trace = trace;
         }
         
         public Type TriggerValueType
@@ -55,14 +58,16 @@ namespace Redis.WebJobs.Extensions.Triggers
             get { return _mode; }
         }
 
-        public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
+        public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
 
             IReadOnlyDictionary<string, object> bindingData = (_bindingDataProvider != null)
                 ? _bindingDataProvider.GetBindingData(provider.GetValue()) : null;
 
-            return new TriggerData(provider, bindingData);
+            var result = new TriggerData(provider, bindingData);
+
+            return Task.FromResult<ITriggerData>(result);
         }
         
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
@@ -76,11 +81,11 @@ namespace Redis.WebJobs.Extensions.Triggers
             
             if (_mode == Mode.PubSub)
             {
-                listener = new RedisChannelListener(_channelOrKey, context.Executor, _config);
+                listener = new RedisChannelListener(_channelOrKey, context.Executor, _config, _trace);
             }
             else
             {
-                listener = new RedisCacheListener(_channelOrKey, context.Executor, _config);
+                listener = new RedisCacheListener(_channelOrKey, context.Executor, _config, _trace);
             }
             return Task.FromResult(listener);
         }

@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Executors;
 
 namespace Redis.WebJobs.Extensions.Listeners
 {
     public class RedisProcessor
     {
-        public RedisProcessor(RedisProcessorContext context)
+        private readonly TraceWriter _trace;
+        public RedisProcessor(RedisProcessorContext context, TraceWriter trace)
         {
             if (context == null)
             {
@@ -15,6 +17,7 @@ namespace Redis.WebJobs.Extensions.Listeners
             }
 
             ChannelOrKey = context.ChannelOrKey;
+            _trace = trace;
         }
 
         public string ChannelOrKey { get; set; }

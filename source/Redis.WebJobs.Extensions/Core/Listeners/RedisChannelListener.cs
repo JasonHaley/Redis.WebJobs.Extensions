@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Redis.WebJobs.Extensions.Config;
 using Redis.WebJobs.Extensions.Framework;
@@ -15,8 +16,9 @@ namespace Redis.WebJobs.Extensions.Listeners
         private readonly RedisProcessor _redisProcessor;
         private readonly string _channelOrKey;
         private PubSubReceiver _receiver;
+        private readonly TraceWriter _trace;
 
-        public RedisChannelListener(string channelOrKey, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config)
+        public RedisChannelListener(string channelOrKey, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config, TraceWriter trace)
             : base()
         {
             _channelOrKey = channelOrKey;
@@ -24,6 +26,7 @@ namespace Redis.WebJobs.Extensions.Listeners
             _config = config;
 
             _redisProcessor = CreateProcessor(channelOrKey);
+            _trace = trace;
         }
 
         protected override void OnStarting()
@@ -95,12 +98,12 @@ namespace Redis.WebJobs.Extensions.Listeners
         private RedisProcessor CreateProcessor(string channelName)
         {
             var context = new RedisProcessorContext(channelName);
-            return new RedisProcessor(context);
+            return new RedisProcessor(context, _trace);
         }
 
         private PubSubReceiver CreateReceiver(RedisConfiguration config, string channelOrKey)
         {
-            return new PubSubReceiver(config, channelOrKey);
+            return new PubSubReceiver(config, channelOrKey, _trace);
         }
     }
 }
