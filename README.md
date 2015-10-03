@@ -74,7 +74,9 @@ public static void GetMessage([RedisTrigger("messages", Mode.PubSub)] string mes
 ```
 
 #RedisTrigger
-A trigger that subscribes to a Redis Channel, passing in messages as they are published.
+This trigger has two modes: 
+PubSub - the trigger will subscribe to a Redis Channel, passing in messages as they are published.
+Cache - the trigger will check the value of a redis cache key on a determined TimeSpan frequency and compare the value to the previous checked value and will call function if values are different.  Uses a string compare on json serialized objects.
 
 Example of receiving string messages
 ```
@@ -84,7 +86,7 @@ public static void ReceiveSimpleMessage([RedisTrigger("messages", Mode.PubSub)] 
 }
 ```
 
-Example of receiving serialized json objects in message
+Example of receiving deserialized json objects in message
 ```
 public static void ReceiveMessage([RedisTrigger("messages", Mode.PubSub)] Message message, TextWriter log)
 {
@@ -96,6 +98,24 @@ public static void ReceiveMessage([RedisTrigger("messages", Mode.PubSub)] Messag
   {
     log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
   }
+}
+```
+
+Example of receiving a string messages when cache value for a given key has changed
+```
+public static void GetCacheTriggerSimpleMessage([RedisTrigger("LastSimpleMessage", Mode.Cache)] string lastMessage, 
+  TextWriter log)
+{
+  log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+}
+```
+
+Example of receiving a deserialized json object when a cache value for a given key has changed (uses a string comparison to determine value change)
+```
+public static void GetCacheTriggerMessage([RedisTrigger("LastMessage", Mode.Cache)] Message lastMessage, 
+  TextWriter log)
+{
+  log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
 }
 ```
 
