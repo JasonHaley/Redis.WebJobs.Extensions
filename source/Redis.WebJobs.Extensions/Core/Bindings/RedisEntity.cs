@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Extensions.Framework;
+using Microsoft.Azure.WebJobs.Host.Bindings.Path;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using StackExchange.Redis;
 
@@ -11,9 +11,9 @@ namespace Redis.WebJobs.Extensions.Bindings
     internal class RedisEntity
     {
         private IReadOnlyDictionary<string, object> _bindingData;
-        private readonly BindablePath _channelOrKeyPath;
+        private readonly BindingTemplate _channelOrKeyPath;
 
-        public RedisEntity(RedisAccount account, BindablePath channelOrKeyPath, Mode mode, IReadOnlyDictionary<string, object> bindingData)
+        public RedisEntity(RedisAccount account, BindingTemplate channelOrKeyPath, Mode mode, IReadOnlyDictionary<string, object> bindingData)
         {
             Account = account;
             Mode = mode;

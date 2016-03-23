@@ -13,7 +13,7 @@ namespace SamplePublisher
         static void Main(string[] args)
         {
             JobHostConfiguration config = new JobHostConfiguration();
-            config.Tracing.Trace = new ConsoleTraceWriter(TraceLevel.Verbose);
+            //config.Tracing.Trace = new ConsoleTraceWriter(TraceLevel.Verbose);
             config.UseRedis();
             
             JobHost host = new JobHost(config);

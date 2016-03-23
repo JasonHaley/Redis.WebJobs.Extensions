@@ -3,9 +3,8 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
-using Microsoft.Azure.WebJobs.Extensions.Framework;
 using Microsoft.Azure.WebJobs.Host;
-
+using Microsoft.Azure.WebJobs.Host.Bindings.Path;
 namespace Redis.WebJobs.Extensions.Bindings
 {
     internal class RedisBinding : IBinding
@@ -14,7 +13,7 @@ namespace Redis.WebJobs.Extensions.Bindings
         private readonly IArgumentBinding<RedisEntity> _argumentBinding;
         private readonly RedisAccount _account;
         private readonly RedisAttribute _attribute;
-        private readonly BindablePath _channelOrKeyPath;
+        private readonly BindingTemplate _channelOrKeyPath;
         private readonly Mode _mode;
         private readonly TraceWriter _trace;
 
@@ -27,7 +26,7 @@ namespace Redis.WebJobs.Extensions.Bindings
             _attribute = attribute;
             _mode = attribute.Mode;
 
-            _channelOrKeyPath = new BindablePath(attribute.ChannelOrKey);
+            _channelOrKeyPath = BindingTemplate.FromString(attribute.ChannelOrKey);
             _trace = trace;
         }
 
