@@ -23,14 +23,13 @@ namespace Redis.WebJobs.Extensions.Listeners
 
         public RedisCacheListener(string channelOrKey, ITriggeredFunctionExecutor triggerExecutor,
             RedisConfiguration config, TraceWriter trace)
-            : base()
         {
             _channelOrKey = channelOrKey;
             _triggerExecutor = triggerExecutor;
             _config = config;
             _lastValueKeyName = _config.LastValueKeyNamePrefix + channelOrKey;
-            _redisProcessor = CreateProcessor(channelOrKey);
             _trace = trace;
+            _redisProcessor = CreateProcessor(channelOrKey);
         }
         
         protected override void OnStarting()
@@ -64,7 +63,7 @@ namespace Redis.WebJobs.Extensions.Listeners
             
             _timer.Start();
 
-            return Task.FromResult<bool>(true);
+            return Task.FromResult(true);
         }
 
         protected override void OnStopping()
@@ -81,12 +80,12 @@ namespace Redis.WebJobs.Extensions.Listeners
 
         protected override Task StopAsyncCore(CancellationToken cancellationToken)
         {
-            _cancellationTokenSource.Cancel();
+            CancellationTokenSource.Cancel();
 
             _timer.Dispose();
             _timer = null;
 
-            return Task.FromResult<bool>(true);
+            return Task.FromResult(true);
         }
 
         private void OnTimer(object sender, ElapsedEventArgs e)
@@ -111,14 +110,17 @@ namespace Redis.WebJobs.Extensions.Listeners
             await receiver.OnExecuteAsync(ProcessMessageAsync);
 
             // restart the timer with the next schedule occurrence
-            DateTime nextOccurrence = DateTime.Now + _config.CheckCacheFrequency.Value;
-            TimeSpan nextInterval = nextOccurrence - lastOccurrence;
-            StartTimer(nextInterval);
+            if (_config.CheckCacheFrequency != null)
+            {
+                DateTime nextOccurrence = DateTime.Now + _config.CheckCacheFrequency.Value;
+                TimeSpan nextInterval = nextOccurrence - lastOccurrence;
+                StartTimer(nextInterval);
+            }
         }
 
         internal void StartTimer(TimeSpan interval)
         {
-            if (interval > _config.CheckCacheFrequency.Value)
+            if (_config.CheckCacheFrequency != null && interval > _config.CheckCacheFrequency.Value)
             {
                 // if the interval exceeds the maximum interval supported by Timer,
                 // store the remainder and use the max
@@ -137,7 +139,7 @@ namespace Redis.WebJobs.Extensions.Listeners
        
         private Task ProcessMessageAsync(string previousValue, string currentValue)
         {
-            return ProcessMessageAsync(previousValue, currentValue, _cancellationTokenSource.Token);
+            return ProcessMessageAsync(previousValue, currentValue, CancellationTokenSource.Token);
         }
 
         internal async Task ProcessMessageAsync(string previousValue, string currentValue, CancellationToken cancellationToken)
@@ -159,13 +161,13 @@ namespace Redis.WebJobs.Extensions.Listeners
 
         protected override void OnDisposing()
         {
-            if (!_disposed)
+            if (!Disposed)
             {
                 // Running callers might still be using the cancellation token.
                 // Mark it canceled but don't dispose of the source while the callers are running.
                 // Otherwise, callers would receive ObjectDisposedException when calling token.Register.
                 // For now, rely on finalization to clean up _cancellationTokenSource's wait handle (if allocated).
-                _cancellationTokenSource.Cancel();
+                CancellationTokenSource.Cancel();
 
                 if (_timer != null)
                 {
@@ -173,7 +175,7 @@ namespace Redis.WebJobs.Extensions.Listeners
                     _timer = null;
                 }
 
-                _disposed = true;
+                Disposed = true;
             }
         }
         
@@ -187,7 +189,5 @@ namespace Redis.WebJobs.Extensions.Listeners
         {
             return new CacheReceiver(config, channelOrKey, lastValueKeyName, _trace);
         }
-
-
     }
 }

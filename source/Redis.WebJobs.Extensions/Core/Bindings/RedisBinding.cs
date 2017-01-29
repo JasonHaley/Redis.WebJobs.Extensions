@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Protocols;
@@ -25,20 +24,17 @@ namespace Redis.WebJobs.Extensions.Bindings
             _account = account;
             _attribute = attribute;
             _mode = attribute.Mode;
-
+            
             _channelOrKeyPath = BindingTemplate.FromString(attribute.ChannelOrKey);
             _trace = trace;
         }
 
-        public bool FromAttribute
-        {
-            get { return true; }
-        }
+        public bool FromAttribute => true;
 
         public Task<IValueProvider> BindAsync(BindingContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
-
+            
             var entity = CreateEntity(context.BindingData);
 
             return BindAsync(entity, context.ValueContext);
@@ -82,15 +78,15 @@ namespace Redis.WebJobs.Extensions.Bindings
 
             if (mode == Mode.PubSub)
             {
-                descriptor.Description = isInput
-                    ? string.Format(CultureInfo.CurrentCulture, "publish to channel '{0}'", channelOrKey)
-                    : string.Format(CultureInfo.CurrentCulture, "subscribe to channel '{0}'", channelOrKey);
+                descriptor.Description = isInput ? 
+                    $"publish to channel '{channelOrKey}'" : 
+                    $"subscribe to channel '{channelOrKey}'";
             }
             else
             {
-                descriptor.Description = isInput
-                    ? string.Format(CultureInfo.CurrentCulture, "key to get from cache '{0}'", channelOrKey)
-                    : string.Format(CultureInfo.CurrentCulture, "key to add to cache'{0}'", channelOrKey);
+                descriptor.Description = isInput ? 
+                    $"key to get from cache '{channelOrKey}'" : 
+                    $"key to add to cache'{channelOrKey}'";
             }
             descriptor.Prompt = isInput ?
                 "Enter the channel name" :

@@ -1,9 +1,6 @@
 ﻿using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
-using Microsoft.Azure.WebJobs.Host.Triggers;
 using Redis.WebJobs.Extensions.Bindings;
 using Redis.WebJobs.Extensions.Triggers;
 
@@ -15,22 +12,17 @@ namespace Redis.WebJobs.Extensions.Config
 
         public RedisExtensionConfig(RedisConfiguration redisConfig)
         {
-            if (redisConfig == null)
-            {
-                throw new ArgumentNullException("redisConfig");
-            }
-
-            _redisConfig = redisConfig;
+            _redisConfig = redisConfig ?? throw new ArgumentNullException(nameof(redisConfig));
         }
 
-        public RedisConfiguration Config { get { return _redisConfig; } }
+        public RedisConfiguration Config => _redisConfig;
 
         /// <inheritdoc />
         public void Initialize(ExtensionConfigContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             context.Config.RegisterBindingExtensions(

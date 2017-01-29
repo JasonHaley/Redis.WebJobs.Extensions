@@ -27,7 +27,7 @@ namespace Redis.WebJobs.Extensions.Listeners
 
             await _subscriber.SubscribeAsync(_channel, async (rc, m) => await processMessageAsync(m), CommandFlags.None);
 
-            _trace.Verbose(string.Format("Subscribed to {0} channel", _channel));
+            _trace.Verbose($"Subscribed to {_channel} channel");
         }
 
         public Task CloseAsync()

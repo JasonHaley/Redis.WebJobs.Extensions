@@ -9,22 +9,26 @@ namespace Redis.WebJobs.Extensions.Listeners
     public class RedisProcessor
     {
         private readonly TraceWriter _trace;
+
         public RedisProcessor(RedisProcessorContext context, TraceWriter trace)
         {
+            _trace = trace;
+
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             ChannelOrKey = context.ChannelOrKey;
-            _trace = trace;
         }
 
         public string ChannelOrKey { get; set; }
 
         public virtual async Task<bool> BeginMessageArrivedAsync(string message, CancellationToken cancellationToken)
         {
-            return await Task.FromResult<bool>(true);
+            _trace.Verbose($"Message Arrived {message}");
+
+            return await Task.FromResult(true);
         }
 
         public virtual Task EndMessageArrivedAsync(string message, FunctionResult result, CancellationToken cancellationToken)

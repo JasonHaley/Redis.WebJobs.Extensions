@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Redis.WebJobs.Extensions
 {
@@ -9,7 +8,7 @@ namespace Redis.WebJobs.Extensions
             {
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 NullValueHandling = NullValueHandling.Ignore,
-                Formatting = Formatting.Indented
+                Formatting = Formatting.None
             };
     }
 }

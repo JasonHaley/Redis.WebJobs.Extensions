@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace Redis.WebJobs.Extensions
 {
     [AttributeUsage(AttributeTargets.Parameter)]

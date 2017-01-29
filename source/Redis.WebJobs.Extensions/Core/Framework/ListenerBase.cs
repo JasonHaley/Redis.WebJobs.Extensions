@@ -2,20 +2,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Host.Executors;
 using Microsoft.Azure.WebJobs.Host.Listeners;
-using Redis.WebJobs.Extensions.Config;
 
 namespace Redis.WebJobs.Extensions.Framework
 {
     internal abstract class ListenerBase : IListener
     {
-        protected readonly CancellationTokenSource _cancellationTokenSource;
-        protected bool _disposed;
+        protected readonly CancellationTokenSource CancellationTokenSource;
+        protected bool Disposed;
         
         public ListenerBase()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         protected virtual void OnDisposing()
@@ -26,13 +24,13 @@ namespace Redis.WebJobs.Extensions.Framework
         [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_cancellationTokenSource")]
         public void Dispose()
         {
-            if (!_disposed)
+            if (!Disposed)
             {
-                _cancellationTokenSource.Cancel();
+                CancellationTokenSource.Cancel();
 
                 OnDisposing();
                 
-                _disposed = true;
+                Disposed = true;
             }
         }
 
@@ -59,7 +57,7 @@ namespace Redis.WebJobs.Extensions.Framework
 
             OnStopping();
             
-            _cancellationTokenSource.Cancel();
+            CancellationTokenSource.Cancel();
 
             return StopAsyncCore(cancellationToken);
         }
@@ -74,12 +72,12 @@ namespace Redis.WebJobs.Extensions.Framework
         public void Cancel()
         {
             ThrowIfDisposed();
-            _cancellationTokenSource.Cancel();
+            CancellationTokenSource.Cancel();
         }
 
         protected void ThrowIfDisposed()
         {
-            if (_disposed)
+            if (Disposed)
             {
                 throw new ObjectDisposedException(null);
             }

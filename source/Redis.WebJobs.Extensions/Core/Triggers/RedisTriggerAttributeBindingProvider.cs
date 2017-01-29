@@ -14,22 +14,14 @@ namespace Redis.WebJobs.Extensions.Triggers
         
         public RedisTriggerAttributeBindingProvider(RedisConfiguration config, TraceWriter trace)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-            if (trace == null)
-            {
-                throw new ArgumentNullException("trace");
-            }
-            _config = config;
-            _trace = trace;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _trace = trace ?? throw new ArgumentNullException(nameof(trace));
         }
         public Task<ITriggerBinding> TryCreateAsync(TriggerBindingProviderContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             ParameterInfo parameter = context.Parameter;
@@ -40,8 +32,8 @@ namespace Redis.WebJobs.Extensions.Triggers
                 return Task.FromResult<ITriggerBinding>(null);
             }
             
-            RedisAccount account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);
-            ITriggerBinding binding = new RedisTriggerBinding(parameter, account, attribute.ChannelOrKey, attribute.Mode, _config, _trace);
+            //RedisAccount account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);
+            ITriggerBinding binding = new RedisTriggerBinding(parameter, attribute.ChannelOrKey, attribute.Mode, _config, _trace);
             
             return Task.FromResult(binding);
         }

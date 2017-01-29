@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host;
@@ -19,16 +18,14 @@ namespace Redis.WebJobs.Extensions.Triggers
     {
         private readonly ParameterInfo _parameter;
         private readonly IBindingDataProvider _bindingDataProvider;
-        private readonly RedisAccount _account;
         private readonly string _channelOrKey;
         private readonly Mode _mode;
         private readonly RedisConfiguration _config;
         private readonly TraceWriter _trace;
 
-        public RedisTriggerBinding(ParameterInfo parameter, RedisAccount account, string channelOrKey, Mode mode, RedisConfiguration config, TraceWriter trace)
+        public RedisTriggerBinding(ParameterInfo parameter, string channelOrKey, Mode mode, RedisConfiguration config, TraceWriter trace)
         {
             _parameter = parameter;
-            _account = account;
             _channelOrKey = channelOrKey;
             _mode = mode;
             _config = config;
@@ -36,45 +33,31 @@ namespace Redis.WebJobs.Extensions.Triggers
             _trace = trace;
         }
         
-        public Type TriggerValueType
-        {
-            get
-            {
-                return typeof(string);
-            }
-        }
+        public Type TriggerValueType => typeof(string);
 
-        public IReadOnlyDictionary<string, Type> BindingDataContract
-        {
-            get { return _bindingDataProvider != null ? _bindingDataProvider.Contract : null; }
-        }
+        public IReadOnlyDictionary<string, Type> BindingDataContract => _bindingDataProvider?.Contract;
 
-        public string ChannelOrKey
-        {
-            get { return _channelOrKey; }
-        }
-        public Mode Mode
-        {
-            get { return _mode; }
-        }
+        public string ChannelOrKey => _channelOrKey;
 
-        public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
+        public Mode Mode => _mode;
+
+        public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
 
-            IReadOnlyDictionary<string, object> bindingData = (_bindingDataProvider != null)
-                ? _bindingDataProvider.GetBindingData(provider.GetValue()) : null;
+            var providerVal = await provider.GetValueAsync();
+            var bindingData = _bindingDataProvider?.GetBindingData(providerVal);
 
             var result = new TriggerData(provider, bindingData);
 
-            return Task.FromResult<ITriggerData>(result);
+            return result;
         }
         
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
             
             IListener listener;
@@ -108,8 +91,7 @@ namespace Redis.WebJobs.Extensions.Triggers
 
             public override string GetTriggerReason(IDictionary<string, string> arguments)
             {
-                return string.Format(CultureInfo.CurrentCulture, 
-                    (Mode == Mode.PubSub) ? "New message detected on '{0}'." : "New value found at '{0}'", ChannelOrKey);
+                return (Mode == Mode.PubSub) ? $"New message detected on '{ChannelOrKey}'." : $"New value found at '{ChannelOrKey}'";
             }
         }
     }

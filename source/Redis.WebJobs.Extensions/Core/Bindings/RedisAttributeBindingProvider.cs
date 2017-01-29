@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host;
@@ -17,23 +16,15 @@ namespace Redis.WebJobs.Extensions.Bindings
         
         public RedisAttributeBindingProvider(RedisConfiguration config, TraceWriter trace)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-            if (trace == null)
-            {
-                throw new ArgumentNullException("trace");
-            }
-            _config = config;
-            _trace = trace;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _trace = trace ?? throw new ArgumentNullException(nameof(trace));
         }
 
         public Task<IBinding> TryCreateAsync(BindingProviderContext context)
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             ParameterInfo parameter = context.Parameter;
@@ -48,8 +39,7 @@ namespace Redis.WebJobs.Extensions.Bindings
 
             if (argumentBinding == null)
             {
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                    "Can't bind to type '{0}'.", parameter.ParameterType));
+                throw new InvalidOperationException($"Can't bind to type '{parameter.ParameterType}'.");
             }
 
             var account = RedisAccount.CreateDbFromConnectionString(_config.ConnectionString);

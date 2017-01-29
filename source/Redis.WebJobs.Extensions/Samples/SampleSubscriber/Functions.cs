@@ -6,18 +6,18 @@ namespace SampleSubscriber
 {
     public static class Functions
     {
-
-        public static void ReceivePubSubSimpleMessage([RedisTrigger("simpleMessages", Mode.PubSub)] string message, TextWriter log)
+        // PubSub Examples ***********************************************************************************
+        public static void ReceivePubSubSimpleMessage([RedisTrigger("pubsub:simpleMessages", Mode.PubSub)] string message, TextWriter log)
         {
-            log.WriteLine("Received Message: {0}", message);
+            log.WriteLine($"Received Message: {message}");
         }
 
-        public static void ReceivePubSubMessage([RedisTrigger("messages")] Message message, TextWriter log)
+        public static void ReceivePubSubMessage([RedisTrigger("pubsub:messages")] Message message, TextWriter log)
         {
 
             if (message != null)
             {
-                log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+                log.WriteLine($"***ReceivedMessage: {message.Text} Sent: {message.Sent}");
             }
             else
             {
@@ -25,12 +25,12 @@ namespace SampleSubscriber
             }
         }
 
-        public static void ReceivePubSubMessageIdChannel([RedisTrigger("messages:bc3a6131-937c-4541-a0cf-27d49b96a5f2")] Message message, TextWriter log)
+        public static void ReceivePubSubMessageIdChannel([RedisTrigger("pubsub:messages:bc3a6131-937c-4541-a0cf-27d49b96a5f2")] Message message, TextWriter log)
         {
 
             if (message != null)
             {
-                log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+                log.WriteLine($"***ReceivedMessage: {message.Text} Sent: {message.Sent}");
             }
             else
             {
@@ -38,11 +38,11 @@ namespace SampleSubscriber
             }
         }
 
-        public static void ReceiveAllPubSubMessage([RedisTrigger("messages:*")] Message message, TextWriter log)
+        public static void ReceiveAllPubSubMessage([RedisTrigger("pubsub:messages:*")] Message message, TextWriter log)
         {
             if (message != null)
             {
-                log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
+                log.WriteLine($"***ReceivedMessage: {message.Text} Sent: {message.Sent}");
             }
             else
             {
@@ -50,24 +50,21 @@ namespace SampleSubscriber
             }
         }
 
-        public static void GetCacheSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message, [Redis("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
-        {
-            log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
-        }
-
-        public static void GetCacheMessage([RedisTrigger("messages", Mode.PubSub)] string message, [Redis("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
-        {
-            log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
-        }
-
+        // Cache Examples ***********************************************************************************
         public static void GetCacheTriggerSimpleMessage([RedisTrigger("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
         {
-            log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+            log.WriteLine($"LastSimpleMessage retrieved: {lastMessage}");
         }
 
-        public static void GetCacheTriggerMessage([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
+        public static void GetCacheTriggerMessage([RedisTrigger("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
         {
-            log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+            log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+        }
+
+
+        public static void GetCacheTriggerMessageById([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
+        {
+            log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
         }
     }
 

@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Executors;
 using Redis.WebJobs.Extensions.Config;
 using Redis.WebJobs.Extensions.Framework;
-using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Listeners
 {
@@ -19,14 +18,13 @@ namespace Redis.WebJobs.Extensions.Listeners
         private readonly TraceWriter _trace;
 
         public RedisChannelListener(string channelOrKey, ITriggeredFunctionExecutor triggerExecutor, RedisConfiguration config, TraceWriter trace)
-            : base()
         {
             _channelOrKey = channelOrKey;
             _triggerExecutor = triggerExecutor;
             _config = config;
 
-            _redisProcessor = CreateProcessor(channelOrKey);
             _trace = trace;
+            _redisProcessor = CreateProcessor(channelOrKey);
         }
 
         protected override void OnStarting()
@@ -64,9 +62,9 @@ namespace Redis.WebJobs.Extensions.Listeners
             _receiver = null;
         }
 
-        private Task ProcessMessageAsync(string message)
+        private async Task ProcessMessageAsync(string message)
         {
-            return ProcessMessageAsync(message, _cancellationTokenSource.Token);
+            await ProcessMessageAsync(message, CancellationTokenSource.Token);
         }
 
         internal async Task ProcessMessageAsync(string message, CancellationToken cancellationToken)

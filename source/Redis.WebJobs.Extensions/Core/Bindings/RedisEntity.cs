@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings.Path;
 using Microsoft.Azure.WebJobs.Host.Bindings;
@@ -17,17 +16,14 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             Account = account;
             Mode = mode;
-            _channelOrKeyPath = channelOrKeyPath;
             _bindingData = bindingData;
+            _channelOrKeyPath = channelOrKeyPath;
         }
 
         public RedisAccount Account { get; set; }
         public Mode Mode { get; set; }
 
-        public string ChannelOrKey
-        {
-            get { return _channelOrKeyPath.Bind(_bindingData); }
-        }
+        public string ChannelOrKey => _channelOrKeyPath.Bind(_bindingData);
 
         public void SetBindingData(Type contractType, object value)
         {
@@ -41,19 +37,19 @@ namespace Redis.WebJobs.Extensions.Bindings
         }
         public async Task SetAsync(string value)
         {
-            await Account.RedisDb.StringSetAsync(ChannelOrKey, value, null, When.Always, CommandFlags.None);
+            await Account.RedisDb.StringSetAsync(ChannelOrKey, value, null);
         }
 
         public async Task<string> GetAsync()
         {
-            RedisValue value = await Account.RedisDb.StringGetAsync(ChannelOrKey, CommandFlags.None);
+            RedisValue value = await Account.RedisDb.StringGetAsync(ChannelOrKey);
             if (!value.HasValue)
             {
                 return null;
             }
             else
             {
-                return (string)value;
+                return value;
             }
         }
     }

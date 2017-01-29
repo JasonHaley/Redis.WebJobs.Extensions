@@ -35,16 +35,13 @@ namespace Redis.WebJobs.Extensions.Bindings
 
         private class RedisArgumentBinding<TInput> : IArgumentBinding<RedisEntity>
         {
-            public Type ValueType
-            {
-                get { return typeof (TInput); }
-            }
+            public Type ValueType => typeof (TInput);
 
             public Task<IValueProvider> BindAsync(RedisEntity value, ValueBindingContext context)
             {
                 if (context == null)
                 {
-                    throw new ArgumentNullException("context");
+                    throw new ArgumentNullException(nameof(context));
                 }
 
                 IValueProvider provider = new RedisValueBinder<TInput>(value);

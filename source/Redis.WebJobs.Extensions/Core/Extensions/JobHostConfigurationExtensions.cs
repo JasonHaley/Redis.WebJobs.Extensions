@@ -1,7 +1,5 @@
 ﻿using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.WebJobs.Host.Config;
 using Redis.WebJobs.Extensions.Config;
 
 namespace Redis.WebJobs.Extensions
@@ -12,7 +10,7 @@ namespace Redis.WebJobs.Extensions
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
             config.UseRedis(new RedisConfiguration());
@@ -22,11 +20,10 @@ namespace Redis.WebJobs.Extensions
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
-            var redisConfig = new RedisConfiguration();
-            redisConfig.CheckCacheFrequency = checkCacheFrequency;
+            var redisConfig = new RedisConfiguration {CheckCacheFrequency = checkCacheFrequency};
 
             config.UseRedis(redisConfig);
         }
@@ -35,12 +32,12 @@ namespace Redis.WebJobs.Extensions
         {
             if (config == null)
             {
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
             }
 
             if (redisConfig == null)
             {
-                throw new ArgumentNullException("redisConfig");
+                throw new ArgumentNullException(nameof(redisConfig));
             }
 
             config.RegisterExtensionConfigProvider(new RedisExtensionConfig(redisConfig));

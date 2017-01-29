@@ -8,7 +8,7 @@ namespace Redis.WebJobs.Extensions.Listeners
         {
             if (string.IsNullOrEmpty(channelOrKey))
             {
-                throw new ArgumentNullException("channelOrKey");
+                throw new ArgumentNullException(nameof(channelOrKey));
             }
 
             ChannelOrKey = channelOrKey;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Newtonsoft.Json;
 
@@ -45,14 +46,15 @@ namespace Redis.WebJobs.Extensions.Framework
             }
         }
 
-        public Type Type
-        {
-            get { return _valueType; }
-        }
+        public Type Type => _valueType;
 
         public object GetValue()
         {
             return _value;
+        }
+        public Task<object> GetValueAsync()
+        {
+            return Task.FromResult(GetValue());
         }
 
         public string ToInvokeString()
@@ -66,7 +68,7 @@ namespace Redis.WebJobs.Extensions.Framework
             {
                 return JsonConvert.DeserializeObject(message, _valueType, Constants.JsonSerializerSettings);
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
                 return null;
             }
