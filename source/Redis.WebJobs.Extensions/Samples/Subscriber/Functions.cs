@@ -8,7 +8,7 @@ namespace Subscriber
     {
         public static void ReceiveStringMessage([RedisTrigger("pubsub:stringMessages", Mode.PubSub)] string message, TextWriter log)
         {
-            log.WriteLine($"Received Message: {message}");
+            log.WriteLine($"--- Received String Message: {message} ---");
         }
 
         public static void ReceivePocoMessage([RedisTrigger("pubsub:pocoMessages")] Message message, TextWriter log)
@@ -16,12 +16,17 @@ namespace Subscriber
 
             if (message != null)
             {
-                log.WriteLine($"***ReceivedMessage: {message.Text} Sent: {message.Sent}");
+                log.WriteLine($"*** Received Poco Message: {message.Text} Sent: {message.Sent} ***");
             }
             else
             {
-                log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
+                log.WriteLine("*** Received Poco Message: message sent but not compatible withe Message type ***");
             }
+        }
+
+        public static void ReceiveAllMessages([RedisTrigger("pubsub:*")] string message, TextWriter log)
+        {
+            log.WriteLine($"+++ All Messages: Received Message - {message} +++");
         }
     }
 
