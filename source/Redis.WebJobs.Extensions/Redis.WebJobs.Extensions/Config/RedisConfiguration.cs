@@ -2,10 +2,14 @@
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
+using Newtonsoft.Json;
 using Redis.WebJobs.Extensions.Bindings;
+using Redis.WebJobs.Extensions.Framework;
 using Redis.WebJobs.Extensions.Services;
 using Redis.WebJobs.Extensions.Trigger;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -54,19 +58,28 @@ namespace Redis.WebJobs.Extensions
                 var resolvedConnectionStringSetting = nameResolver.Resolve(AzureWebJobsRedisConnectionStringSetting);
                 ConnectionString = resolvedConnectionStringSetting;
             }
+
                         
             var bindingRule = context.AddBindingRule<RedisAttribute>();
             bindingRule.AddValidator(ValidateConnection);
-            bindingRule.BindToCollector<string>(CreateCollector);
+            //bindingRule.BindToCollector<string>(CreateCollector);
+            bindingRule.BindToCollector<RedisMessageOpenType>(typeof(RedisOpenTypeConverter<>), this);
 
             var triggerRule = context.AddBindingRule<RedisTriggerAttribute>();
-            triggerRule.BindToTrigger<string>(new RedisTriggerAttributeBindingProvider(this));
+            triggerRule.BindToTrigger<IReadOnlyList<string>>(new RedisTriggerAttributeBindingProvider(this));
+            //triggerRule.AddConverter<string, IReadOnlyList<string>>(str => JsonConvert.DeserializeObject<IReadOnlyList<string>>(str));
+            //triggerRule.AddConverter<IReadOnlyList<string>, string>(docList => JArray.FromObject(docList).ToString());
+            triggerRule.AddOpenConverter<IReadOnlyList<string>, RedisMessageOpenType>(typeof(RedisMessageOpenTypeBindingConverter<>));
+            
+            //triggerRule.BindToValueProvider<RedisMessageOpenType>((attr, t) => BindForItemAsync(attr, t));
+            //triggerRule.AddConverter<IReadOnlyList<string>, JArray>(docList => JArray.FromObject(docList));
+
 
         }
         private IAsyncCollector<string> CreateCollector(RedisAttribute attribute)
         {
             IRedisService service = CreateService(attribute);
-            return new RedisMessageAsyncCollector(this, attribute, service);
+            return new RedisMessageAsyncCollector<string>(this, attribute, service);
         }
 
         internal Task<IValueBinder> BindForItemAsync(IRedisAttribute attribute, Type type)
@@ -120,6 +133,50 @@ namespace Redis.WebJobs.Extensions
                 ResolvedAttribute = attribute,
                 Service = service
             };
+        }
+
+        private class RedisMessageOpenType : OpenType.Poco
+        {
+            public override bool IsMatch(Type type, OpenTypeMatchContext context)
+            {
+                if (type.IsGenericType
+                    && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    return false;
+                }
+
+                if (type.FullName == "System.Object")
+                {
+                    return true;
+                }
+
+                return base.IsMatch(type, context);
+            }
+        }
+
+        private class RedisMessageOpenTypeBindingConverter<TOutput>
+             : IConverter<IReadOnlyList<string>, TOutput>
+        {
+            public TOutput Convert(IReadOnlyList<string> input)
+            {
+                var firstItem = input.FirstOrDefault();
+                if (firstItem != null)
+                {
+                    return ConvertFromJson<TOutput>(firstItem);
+                }
+                return default(TOutput);
+                //return new List<string> { ConvertToJson(input) }.AsReadOnly();
+            }
+
+            //private string ConvertToJson(TInput input)
+            //{
+            //    return JsonConvert.SerializeObject(input, Constants.JsonSerializerSettings);
+            //}
+
+            private TOutput ConvertFromJson<TOutput>(string json)
+            {
+                return JsonConvert.DeserializeObject<TOutput>(json);
+            }
         }
     }
 }

@@ -3,39 +3,44 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
+using Newtonsoft.Json;
+using Redis.WebJobs.Extensions.Framework;
 using Redis.WebJobs.Extensions.Services;
 
 namespace Redis.WebJobs.Extensions.Bindings
 {
-    internal class RedisMessageAsyncCollector : IAsyncCollector<string>
+    internal class RedisMessageAsyncCollector<TInput> : IAsyncCollector<TInput>
     {
         private readonly List<string> _messages = new List<string>();
         private readonly RedisConfiguration _configuration;
-        private readonly RedisAttribute _attribute;
+        private readonly IRedisAttribute _attribute;
         private readonly IRedisService _service;
 
-        public RedisMessageAsyncCollector(RedisConfiguration configuration, RedisAttribute attribute, IRedisService service)
+        public RedisMessageAsyncCollector(RedisConfiguration configuration, IRedisAttribute attribute, IRedisService service)
         {
             _configuration = configuration;
             _attribute = attribute;
             _service = service;
         }
 
-        public Task AddAsync(string item, CancellationToken cancellationToken = default(CancellationToken))
+        public Task AddAsync(TInput item, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (string.IsNullOrEmpty(item))
+            string message;
+            if (typeof(TInput) == typeof(string))
             {
-                throw new ArgumentNullException("item");
+                message = item.ToString();
+            }
+            else 
+            {
+                message = ConvertToJson(item);
             }
 
-            _messages.Add(item);
+            if (!string.IsNullOrEmpty(message))
+            {
+                _messages.Add(message);
+            }
 
             return Task.CompletedTask;
-        }
-
-        public string Convert(RedisAttribute input)
-        {
-            return "";
         }
 
         public async Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -44,6 +49,11 @@ namespace Redis.WebJobs.Extensions.Bindings
             {
                 await _service.SendAsync(_attribute.ChannelOrKey, message);
             }
+        }
+
+        private string ConvertToJson(TInput input)
+        {
+            return JsonConvert.SerializeObject(input, Constants.JsonSerializerSettings);
         }
     }
 }

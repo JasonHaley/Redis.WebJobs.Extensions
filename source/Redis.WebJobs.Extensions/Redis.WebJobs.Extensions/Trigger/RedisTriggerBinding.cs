@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Listeners;
 using Microsoft.Azure.WebJobs.Host.Protocols;
 using Microsoft.Azure.WebJobs.Host.Triggers;
+using Redis.WebJobs.Extensions.Framework;
 using Redis.WebJobs.Extensions.Listeners;
 
 namespace Redis.WebJobs.Extensions.Trigger
@@ -15,7 +16,7 @@ namespace Redis.WebJobs.Extensions.Trigger
         private readonly RedisConfiguration _configuration;
         private readonly ParameterInfo _parameter;
         private readonly IRedisAttribute _attribute;
-
+        private readonly BindingDataProvider _bindingDataProvider;
         private readonly IReadOnlyDictionary<string, Type> _emptyBindingContract = new Dictionary<string, Type>();
         private readonly IReadOnlyDictionary<string, object> _emptyBindingData = new Dictionary<string, object>();
 
@@ -24,21 +25,30 @@ namespace Redis.WebJobs.Extensions.Trigger
             _configuration = configuration;
             _parameter = parameter;
             _attribute = attribute;
+            //_bindingDataProvider = BindingDataProvider.FromTemplate(_attribute.ChannelOrKey); // ?? {Id} ??
+            _bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
         }
 
         public string ChannelOrKey => _attribute.ChannelOrKey;
         public Mode Mode => _attribute.Mode;
 
-        public Type TriggerValueType => typeof(string);
+        public Type TriggerValueType => typeof(IReadOnlyList<string>);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract
         {
-            get { return _emptyBindingContract; }
+            get { return _bindingDataProvider?.Contract; }
         }
 
-        public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
+        public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
-            return Task.FromResult<ITriggerData>(new TriggerData(null, _emptyBindingData));
+            IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
+
+            var providerVal = await provider.GetValueAsync();
+            var bindingData = _bindingDataProvider?.GetBindingData(providerVal);
+
+            var result = new TriggerData(provider, bindingData);
+
+            return result;
         }
 
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
