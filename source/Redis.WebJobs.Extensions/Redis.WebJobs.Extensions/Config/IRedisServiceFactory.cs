@@ -2,7 +2,7 @@
 
 namespace Redis.WebJobs.Extensions
 {
-    interface IRedisServiceFactory
+    internal interface IRedisServiceFactory
     {
         IRedisService CreateService(string connectionString);
     }

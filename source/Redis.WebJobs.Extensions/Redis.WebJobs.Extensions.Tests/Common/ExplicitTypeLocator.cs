@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace Redis.WebJobs.Extensions.Tests.Common
 {
     // Taken from WebJobs.Extentions.Tests on Github: // todo add url

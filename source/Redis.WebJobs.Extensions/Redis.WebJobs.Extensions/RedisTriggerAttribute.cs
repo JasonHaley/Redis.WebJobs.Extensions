@@ -20,6 +20,13 @@ namespace Redis.WebJobs.Extensions
             Mode = mode;
         }
 
+        public RedisTriggerAttribute(string channelOrKey, Mode mode, string connectionStringSetting)
+        {
+            ChannelOrKey = channelOrKey;
+            Mode = mode;
+            ConnectionStringSetting = connectionStringSetting;
+        }
+
         [AutoResolve]
         public string ChannelOrKey { get; private set; }
         

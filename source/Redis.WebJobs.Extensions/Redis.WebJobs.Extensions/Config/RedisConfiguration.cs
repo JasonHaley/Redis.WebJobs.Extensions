@@ -6,7 +6,6 @@ using Redis.WebJobs.Extensions.Bindings;
 using Redis.WebJobs.Extensions.Services;
 using Redis.WebJobs.Extensions.Trigger;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -15,12 +14,11 @@ namespace Redis.WebJobs.Extensions
     public class RedisConfiguration : IExtensionConfigProvider
     {
         internal const string AzureWebJobsRedisConnectionStringSetting = "AzureWebJobsRedisConnectionString";
-        private bool _isConnectionStringInitialized = false;
         
         public RedisConfiguration(string connectionStringSetting)
            : this()
         {
-            ConnectionString = AmbientConnectionStringProvider.Instance.GetConnectionString(connectionStringSetting);
+            SetConnectionString(connectionStringSetting);
         }
 
         public RedisConfiguration()
@@ -67,7 +65,7 @@ namespace Redis.WebJobs.Extensions
         }
         private IAsyncCollector<string> CreateCollector(RedisAttribute attribute)
         {
-            IRedisService service = GetService(attribute);
+            IRedisService service = CreateService(attribute);
             return new RedisMessageAsyncCollector(this, attribute, service);
         }
 
@@ -107,7 +105,7 @@ namespace Redis.WebJobs.Extensions
             // Second, try the config's ConnectionString
             return ConnectionString;
         }
-        internal IRedisService GetService(IRedisAttribute attribute)
+        internal IRedisService CreateService(IRedisAttribute attribute)
         {
             string resolvedConnectionString = ResolveConnectionString(attribute.ConnectionStringSetting);
             return RedisServiceFactory.CreateService(resolvedConnectionString);
@@ -115,7 +113,7 @@ namespace Redis.WebJobs.Extensions
 
         internal RedisContext CreateContext(IRedisAttribute attribute)
         {
-            IRedisService service = GetService(attribute);
+            IRedisService service = CreateService(attribute);
 
             return new RedisContext
             {

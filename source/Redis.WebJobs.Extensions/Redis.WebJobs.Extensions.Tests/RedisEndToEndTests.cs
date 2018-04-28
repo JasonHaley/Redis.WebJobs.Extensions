@@ -10,43 +10,43 @@ namespace Redis.WebJobs.Extensions.Tests
 {
     public class RedisEndToEndTests
     {
-        [Fact]
-        public async Task OutputBinding_PubSubString()
-        {
-            // Arrange
-            string channelName = "pubsub:Channel9";
-            string message = "String message";
+        //[Fact]
+        //public async Task OutputBinding_PubSubString()
+        //{
+        //    // Arrange
+        //    string channelName = "pubsub:Channel9";
+        //    string message = "String message";
             
-            string testName = nameof(RedisEndToEndFunctions.SendSimplePubSubMessage);
-            Type testType = typeof(RedisEndToEndTests);
-            ExplicitTypeLocator locator = new ExplicitTypeLocator(testType);
+        //    string testName = nameof(RedisEndToEndFunctions.SendSimplePubSubMessage);
+        //    Type testType = typeof(RedisEndToEndTests);
+        //    ExplicitTypeLocator locator = new ExplicitTypeLocator(testType);
 
-            // Act
-            JobHostConfiguration config = new JobHostConfiguration
-            {
-                TypeLocator = locator
-            };
+        //    // Act
+        //    JobHostConfiguration config = new JobHostConfiguration
+        //    {
+        //        TypeLocator = locator
+        //    };
 
-            config.UseRedis();
+        //    config.UseRedis();
 
-            JobHost host = new JobHost(config);
+        //    JobHost host = new JobHost(config);
 
-            await host.StartAsync();
-            await host.CallAsync(testType.GetMethod(testName));
-            await host.StopAsync();
+        //    await host.StartAsync();
+        //    await host.CallAsync(testType.GetMethod(testName));
+        //    await host.StopAsync();
 
-            //// Assert
-            //Assert.Equal(channelName, attribute.ChannelOrKey);
-            //Assert.Equal(Mode.PubSub, attribute.Mode);
-        }
+        //    //// Assert
+        //    //Assert.Equal(channelName, attribute.ChannelOrKey);
+        //    //Assert.Equal(Mode.PubSub, attribute.Mode);
+        //}
 
-        private class RedisEndToEndFunctions
-        {
-            public static void SendSimplePubSubMessage(
-                [Redis("pubsub:stringMessages")] out string message)
-            {
-                message = "This is a test";
-            }
-        }
+        //private class RedisEndToEndFunctions
+        //{
+        //    public static void SendSimplePubSubMessage(
+        //        [Redis("pubsub:stringMessages")] out string message)
+        //    {
+        //        message = "This is a test";
+        //    }
+        //}
     }
 }
