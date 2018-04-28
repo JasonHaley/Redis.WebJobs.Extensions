@@ -66,10 +66,10 @@ namespace Redis.WebJobs.Extensions
             bindingRule.BindToCollector<RedisMessageOpenType>(typeof(RedisOpenTypeConverter<>), this);
 
             var triggerRule = context.AddBindingRule<RedisTriggerAttribute>();
-            triggerRule.BindToTrigger<IReadOnlyList<string>>(new RedisTriggerAttributeBindingProvider(this));
+            triggerRule.BindToTrigger<string>(new RedisTriggerAttributeBindingProvider(this));
             //triggerRule.AddConverter<string, IReadOnlyList<string>>(str => JsonConvert.DeserializeObject<IReadOnlyList<string>>(str));
             //triggerRule.AddConverter<IReadOnlyList<string>, string>(docList => JArray.FromObject(docList).ToString());
-            triggerRule.AddOpenConverter<IReadOnlyList<string>, RedisMessageOpenType>(typeof(RedisMessageOpenTypeBindingConverter<>));
+            triggerRule.AddOpenConverter<string, RedisMessageOpenType>(typeof(RedisMessageOpenTypeBindingConverter<>));
             
             //triggerRule.BindToValueProvider<RedisMessageOpenType>((attr, t) => BindForItemAsync(attr, t));
             //triggerRule.AddConverter<IReadOnlyList<string>, JArray>(docList => JArray.FromObject(docList));
@@ -155,23 +155,16 @@ namespace Redis.WebJobs.Extensions
         }
 
         private class RedisMessageOpenTypeBindingConverter<TOutput>
-             : IConverter<IReadOnlyList<string>, TOutput>
+             : IConverter<string, TOutput>
         {
-            public TOutput Convert(IReadOnlyList<string> input)
+            public TOutput Convert(string input)
             {
-                var firstItem = input.FirstOrDefault();
-                if (firstItem != null)
+                if (input != null)
                 {
-                    return ConvertFromJson<TOutput>(firstItem);
+                    return ConvertFromJson<TOutput>(input);
                 }
                 return default(TOutput);
-                //return new List<string> { ConvertToJson(input) }.AsReadOnly();
             }
-
-            //private string ConvertToJson(TInput input)
-            //{
-            //    return JsonConvert.SerializeObject(input, Constants.JsonSerializerSettings);
-            //}
 
             private TOutput ConvertFromJson<TOutput>(string json)
             {

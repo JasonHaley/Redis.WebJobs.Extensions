@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.WebJobs.Host;
-using Redis.WebJobs.Extensions;
+﻿using Redis.WebJobs.Extensions;
 using System;
 using System.IO;
 
@@ -7,12 +6,12 @@ namespace Subscriber
 {
     public static class Functions
     {
-        //public static void ReceivePubSubSimpleMessage([RedisTrigger("pubsub:simpleMessages", Mode.PubSub)] string message, TextWriter log)
-        //{
-        //    log.WriteLine($"Received Message: {message}");
-        //}
+        public static void ReceiveStringMessage([RedisTrigger("pubsub:stringMessages", Mode.PubSub)] string message, TextWriter log)
+        {
+            log.WriteLine($"Received Message: {message}");
+        }
 
-        public static void ReceivePubSubMessage([RedisTrigger("pubsub:messages")] Message message, TextWriter log)
+        public static void ReceivePocoMessage([RedisTrigger("pubsub:pocoMessages")] Message message, TextWriter log)
         {
 
             if (message != null)

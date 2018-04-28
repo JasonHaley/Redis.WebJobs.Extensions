@@ -32,7 +32,7 @@ namespace Redis.WebJobs.Extensions.Trigger
         public string ChannelOrKey => _attribute.ChannelOrKey;
         public Mode Mode => _attribute.Mode;
 
-        public Type TriggerValueType => typeof(IReadOnlyList<string>);
+        public Type TriggerValueType => typeof(string);
 
         public IReadOnlyDictionary<string, Type> BindingDataContract
         {
