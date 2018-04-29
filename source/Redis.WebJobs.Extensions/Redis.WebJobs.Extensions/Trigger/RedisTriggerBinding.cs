@@ -60,14 +60,14 @@ namespace Redis.WebJobs.Extensions.Trigger
 
             IListener listener;
 
-            //if (_mode == Mode.PubSub)
-            //{
+            if (_attribute.Mode == Mode.PubSub)
+            {
                 listener = new RedisChannelListener(_configuration, _attribute, context.Executor);
-            //}
-            //else
-            //{
-            //    listener = new RedisCacheListener(_channelOrKey, context.Executor, _config, _trace);
-            //}
+            }
+            else
+            {
+                listener = new RedisCacheListener(_configuration, _attribute, context.Executor);
+            }
             return Task.FromResult(listener);
         }
 

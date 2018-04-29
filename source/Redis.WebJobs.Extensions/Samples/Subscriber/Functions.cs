@@ -28,6 +28,22 @@ namespace Subscriber
         {
             log.WriteLine($"+++ All Messages: Received Message - {message} +++");
         }
+
+        // Cache Examples ***********************************************************************************
+        public static void GetStringCache([RedisTrigger("StringKey", Mode.Cache)] string lastMessage, TextWriter log)
+        {
+            log.WriteLine($"StringKey retrieved: {lastMessage}");
+        }
+
+        public static void GetPocoCache([RedisTrigger("PocoKey", Mode.Cache)] Message lastMessage, TextWriter log)
+        {
+            log.WriteLine($"PocoKey retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+        }
+
+        public static void GetCacheTriggerMessageById([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
+        {
+            log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+        }
     }
 
     public class Message

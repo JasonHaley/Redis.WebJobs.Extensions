@@ -8,17 +8,19 @@ using Redis.WebJobs.Extensions;
 
 namespace FunctionApp
 {
-    public static class PublisherFunction
+    public static class SendMessageFunction
     {
-        [FunctionName("PublisherFunction")]
+        [FunctionName("SendMessage")]
         public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequest req,
-            [Redis("pubsub:simpleMessages", Mode.PubSub)] IAsyncCollector<string> messages, TextWriter log)
+            [Redis("pubsub:messages", Mode.PubSub)] IAsyncCollector<string> messages, TextWriter log)
         {
             string message = req.Query["message"];
 
-            string requestBody = new StreamReader(req.Body).ReadToEnd();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            message = message ?? data?.message;
+            if (string.IsNullOrEmpty(message))
+            {
+                string requestBody = new StreamReader(req.Body).ReadToEnd();
+                message = requestBody;
+            }
 
             messages.AddAsync(message);
 

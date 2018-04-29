@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
@@ -47,7 +46,14 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             foreach(var message in _messages)
             {
-                await _service.SendAsync(_attribute.ChannelOrKey, message);
+                if (_attribute.Mode == Mode.PubSub)
+                {
+                    await _service.SendAsync(_attribute.ChannelOrKey, message);
+                }
+                else 
+                {
+                    await _service.SetAsync(_attribute.ChannelOrKey, message);
+                }
             }
         }
 

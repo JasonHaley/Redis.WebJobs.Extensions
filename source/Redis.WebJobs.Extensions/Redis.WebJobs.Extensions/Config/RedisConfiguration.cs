@@ -4,12 +4,10 @@ using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
 using Newtonsoft.Json;
 using Redis.WebJobs.Extensions.Bindings;
-using Redis.WebJobs.Extensions.Framework;
 using Redis.WebJobs.Extensions.Services;
 using Redis.WebJobs.Extensions.Trigger;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -62,40 +60,43 @@ namespace Redis.WebJobs.Extensions
                         
             var bindingRule = context.AddBindingRule<RedisAttribute>();
             bindingRule.AddValidator(ValidateConnection);
-            //bindingRule.BindToCollector<string>(CreateCollector);
             bindingRule.BindToCollector<RedisMessageOpenType>(typeof(RedisOpenTypeConverter<>), this);
+
+            //bindingRule.BindToCollector<string>(CreateCollector);
 
             var triggerRule = context.AddBindingRule<RedisTriggerAttribute>();
             triggerRule.BindToTrigger<string>(new RedisTriggerAttributeBindingProvider(this));
+            triggerRule.AddOpenConverter<string, RedisMessageOpenType>(typeof(RedisMessageOpenTypeBindingConverter<>));
+
             //triggerRule.AddConverter<string, IReadOnlyList<string>>(str => JsonConvert.DeserializeObject<IReadOnlyList<string>>(str));
             //triggerRule.AddConverter<IReadOnlyList<string>, string>(docList => JArray.FromObject(docList).ToString());
-            triggerRule.AddOpenConverter<string, RedisMessageOpenType>(typeof(RedisMessageOpenTypeBindingConverter<>));
-            
+
+
             //triggerRule.BindToValueProvider<RedisMessageOpenType>((attr, t) => BindForItemAsync(attr, t));
             //triggerRule.AddConverter<IReadOnlyList<string>, JArray>(docList => JArray.FromObject(docList));
 
 
         }
-        private IAsyncCollector<string> CreateCollector(RedisAttribute attribute)
-        {
-            IRedisService service = CreateService(attribute);
-            return new RedisMessageAsyncCollector<string>(this, attribute, service);
-        }
+        //private IAsyncCollector<string> CreateCollector(RedisAttribute attribute)
+        //{
+        //    IRedisService service = CreateService(attribute);
+        //    return new RedisMessageAsyncCollector<string>(this, attribute, service);
+        //}
 
-        internal Task<IValueBinder> BindForItemAsync(IRedisAttribute attribute, Type type)
-        {
-            if (string.IsNullOrEmpty(attribute.ChannelOrKey))
-            {
-                throw new InvalidOperationException("The 'ChannelOrKey' property of a CosmosDB single-item input binding cannot be null or empty.");
-            }
+        //internal Task<IValueBinder> BindForItemAsync(IRedisAttribute attribute, Type type)
+        //{
+        //    if (string.IsNullOrEmpty(attribute.ChannelOrKey))
+        //    {
+        //        throw new InvalidOperationException("The 'ChannelOrKey' property of a CosmosDB single-item input binding cannot be null or empty.");
+        //    }
 
-            RedisContext context = CreateContext(attribute);
+        //    RedisContext context = CreateContext(attribute);
 
-            Type genericType = typeof(RedisValueBinder<>).MakeGenericType(type);
-            IValueBinder binder = (IValueBinder)Activator.CreateInstance(genericType, context);
+        //    Type genericType = typeof(RedisValueBinder<>).MakeGenericType(type);
+        //    IValueBinder binder = (IValueBinder)Activator.CreateInstance(genericType, context);
 
-            return Task.FromResult(binder);
-        }
+        //    return Task.FromResult(binder);
+        //}
         internal void ValidateConnection(RedisAttribute attribute, Type paramType)
         {
             if (string.IsNullOrEmpty(ConnectionString) &&
@@ -161,14 +162,9 @@ namespace Redis.WebJobs.Extensions
             {
                 if (input != null)
                 {
-                    return ConvertFromJson<TOutput>(input);
+                    return JsonConvert.DeserializeObject<TOutput>(input);
                 }
                 return default(TOutput);
-            }
-
-            private TOutput ConvertFromJson<TOutput>(string json)
-            {
-                return JsonConvert.DeserializeObject<TOutput>(json);
             }
         }
     }

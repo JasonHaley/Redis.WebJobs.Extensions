@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Azure.WebJobs.Host.Listeners;
+using Redis.WebJobs.Extensions.Listeners;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -82,6 +83,12 @@ namespace Redis.WebJobs.Extensions.Framework
             {
                 throw new ObjectDisposedException(null);
             }
+        }
+
+        protected RedisProcessor CreateProcessor(string channelName)
+        {
+            var context = new RedisProcessorContext(channelName);
+            return new RedisProcessor(context);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿
 using StackExchange.Redis;
-using System;
 using System.Threading.Tasks;
 
 namespace Redis.WebJobs.Extensions.Services
@@ -9,8 +8,8 @@ namespace Redis.WebJobs.Extensions.Services
     {
         ISubscriber GetSubscriber();
         Task SendAsync(string channel, string message);
-        Task<RedisValue> StringGetAsync(RedisKey key);
-        Task StringSetAsync(RedisKey key, RedisValue value);
-
+        Task<string> GetAsync(string key);
+        Task SetAsync(string key, string value);
+        Task<bool> KeyExistsAsync(string key);
     }
 }

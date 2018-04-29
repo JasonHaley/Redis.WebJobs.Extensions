@@ -87,13 +87,7 @@ namespace Redis.WebJobs.Extensions.Listeners
                 _receiver = null;
             }
         }
-
-        private RedisProcessor CreateProcessor(string channelName)
-        {
-            var context = new RedisProcessorContext(channelName);
-            return new RedisProcessor(context);
-        }
-
+        
         private RedisChannelReceiver CreateReceiver(RedisConfiguration configuration, IRedisAttribute attribute)
         {
             return new RedisChannelReceiver(configuration, attribute);
