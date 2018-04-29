@@ -11,12 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis.WebJobs.Extensions.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publisher", "Samples\Publisher\Publisher.csproj", "{CDEE26A0-54C5-4912-B2BB-0BBC860EBB84}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebJobs.Extensions", "..\..\..\azure-webjobs-sdk-extensions\src\WebJobs.Extensions\WebJobs.Extensions.csproj", "{436E6051-FB7E-4590-B3CF-146FE257149D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebJobs", "..\..\..\azure-webjobs-sdk\src\Microsoft.Azure.WebJobs\WebJobs.csproj", "{5A95CCB3-7E03-492F-87EB-E95386DD557C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebJobs.Host", "..\..\..\azure-webjobs-sdk\src\Microsoft.Azure.WebJobs.Host\WebJobs.Host.csproj", "{0C7B3CD0-100B-44C4-A3EF-F931F9E32F9D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Subscriber", "Samples\Subscriber\Subscriber.csproj", "{C5A2BDF1-07C2-4084-A0FF-684F8E92B54F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FuntionSamples", "FuntionSamples", "{F0F21181-762F-4093-99CA-1745AAB28B79}"
@@ -41,18 +35,6 @@ Global
 		{CDEE26A0-54C5-4912-B2BB-0BBC860EBB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDEE26A0-54C5-4912-B2BB-0BBC860EBB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDEE26A0-54C5-4912-B2BB-0BBC860EBB84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{436E6051-FB7E-4590-B3CF-146FE257149D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{436E6051-FB7E-4590-B3CF-146FE257149D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{436E6051-FB7E-4590-B3CF-146FE257149D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{436E6051-FB7E-4590-B3CF-146FE257149D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A95CCB3-7E03-492F-87EB-E95386DD557C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A95CCB3-7E03-492F-87EB-E95386DD557C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A95CCB3-7E03-492F-87EB-E95386DD557C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A95CCB3-7E03-492F-87EB-E95386DD557C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C7B3CD0-100B-44C4-A3EF-F931F9E32F9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C7B3CD0-100B-44C4-A3EF-F931F9E32F9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C7B3CD0-100B-44C4-A3EF-F931F9E32F9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C7B3CD0-100B-44C4-A3EF-F931F9E32F9D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5A2BDF1-07C2-4084-A0FF-684F8E92B54F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C5A2BDF1-07C2-4084-A0FF-684F8E92B54F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5A2BDF1-07C2-4084-A0FF-684F8E92B54F}.Release|Any CPU.ActiveCfg = Release|Any CPU

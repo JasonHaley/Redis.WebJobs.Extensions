@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\azure-webjobs-sdk-extensions\src\WebJobs.Extensions\WebJobs.Extensions.csproj" />
     <ProjectReference Include="..\..\Redis.WebJobs.Extensions\Redis.WebJobs.Extensions.csproj" />
   </ItemGroup>
 
