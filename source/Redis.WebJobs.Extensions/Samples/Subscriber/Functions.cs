@@ -51,9 +51,6 @@ namespace Subscriber
             [Redis("StringKey", Mode.Cache)] string message,
             TextWriter log)
         {
-            counter =+ 1;
-            message = $"{message}..{counter}";
-
             log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
         }
 
