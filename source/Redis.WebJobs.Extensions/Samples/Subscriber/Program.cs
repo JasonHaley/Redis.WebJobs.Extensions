@@ -11,6 +11,8 @@ namespace Subscriber
             JobHostConfiguration config = new JobHostConfiguration();
 
             config.UseRedis();
+            
+            config.UseTimers();
 
             config.LoggerFactory.AddConsole();
 

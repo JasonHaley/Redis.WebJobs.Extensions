@@ -1,4 +1,5 @@
-﻿using Redis.WebJobs.Extensions;
+﻿using Microsoft.Azure.WebJobs;
+using Redis.WebJobs.Extensions;
 using System;
 using System.IO;
 
@@ -40,9 +41,30 @@ namespace Subscriber
             log.WriteLine($"PocoKey retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
         }
 
-        public static void GetCacheTriggerMessageById([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
+        //public static void GetCacheTriggerMessageById([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
+        //{
+        //    log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+        //}
+        
+        private static int counter = 0;
+        public static void GetStringValueFromCache([TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
+            [Redis("StringKey", Mode.Cache)] string message,
+            TextWriter log)
         {
-            log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+            counter =+ 1;
+            message = $"{message}..{counter}";
+
+            log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
+        }
+
+        public static void GetPocoValueFromCache([TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
+            [Redis("PocoKey", Mode.Cache)] Message message,
+            TextWriter log)
+        {
+            counter = +1;
+            message.Text = $"{message.Text}..{counter}";
+
+            log.WriteLine($"Adding String to cache from SetStringToCache(): {message.Text}");
         }
     }
 

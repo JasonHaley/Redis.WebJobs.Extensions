@@ -2,8 +2,6 @@
 using Redis.WebJobs.Extensions;
 using System;
 using System.Threading.Tasks;
-using System.Configuration;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace Publisher

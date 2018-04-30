@@ -55,7 +55,7 @@ namespace Publisher
 
             log.WriteLine($"Adding Message to cache from SetPocoToCache(): {message.Id}");
         }
-
+        
         public class Message
         {
             public Guid Id { get; set; }
