@@ -25,6 +25,15 @@ namespace Subscriber
             }
         }
 
+        public static void EchoMessageUsingResolver([RedisTrigger("pubsub:pocoMessages")] Message message,
+           [Redis("pubsub:{Id}", Mode.PubSub)] IAsyncCollector<string> messages, TextWriter log)
+        {
+            message.Text = "This is a test POCO message ECHO ECHO ECHO";
+            messages.AddAsync(message.Text);
+
+            log.WriteLine($"Sending Message from SendPocoMessageUsingResolver(): {message.Id}");
+        }
+
         public static void ReceiveAllMessages([RedisTrigger("pubsub:*")] string message, TextWriter log)
         {
             log.WriteLine($"+++ All Messages: Received Message - {message} +++");
@@ -41,11 +50,11 @@ namespace Subscriber
             log.WriteLine($"PocoKey retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
         }
 
-        //public static void GetCacheTriggerMessageById([RedisTrigger("LastMessage:bc3a6131-937c-4541-a0cf-27d49b96a5f2", Mode.Cache)] Message lastMessage, TextWriter log)
-        //{
-        //    log.WriteLine($"LastMessage retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
-        //}
-        
+        public static void GetStringCacheUsingEnvVariable([RedisTrigger("%CacheKey%", Mode.Cache)] string lastMessage, TextWriter log)
+        {
+            log.WriteLine($"CacheKey environment variable retrieved: {lastMessage}");
+        }
+
         private static int counter = 0;
         public static void GetStringValueFromCache([TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
             [Redis("StringKey", Mode.Cache)] string message,
@@ -63,6 +72,8 @@ namespace Subscriber
 
             log.WriteLine($"Adding String to cache from SetStringToCache(): {message.Text}");
         }
+
+        
     }
 
     public class Message

@@ -10,6 +10,8 @@ namespace Subscriber
         {
             JobHostConfiguration config = new JobHostConfiguration();
 
+            config.NameResolver = new NameResolver();
+
             config.UseRedis();
             
             config.UseTimers();

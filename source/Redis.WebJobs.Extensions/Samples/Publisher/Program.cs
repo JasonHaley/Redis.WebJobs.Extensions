@@ -13,6 +13,8 @@ namespace Publisher
         
             JobHostConfiguration config = new JobHostConfiguration();
 
+            config.NameResolver = new NameResolver();
+            
             config.UseRedis();
 
             config.LoggerFactory.AddConsole();
@@ -28,23 +30,23 @@ namespace Publisher
             // Give subscriber chance to startup
             Task.Delay(5000).Wait();
 
-            //host.Call(typeof(Functions).GetMethod("SendStringMessage"));
-            //Task.Delay(5000).Wait();
+            host.Call(typeof(Functions).GetMethod("SendStringMessage"));
+            Task.Delay(5000).Wait();
 
-            //host.Call(typeof(Functions).GetMethod("SendMultipleStringPubSubMessages"));
-            //Task.Delay(5000).Wait();
+            host.Call(typeof(Functions).GetMethod("SendMultipleStringPubSubMessages"));
+            Task.Delay(5000).Wait();
 
-            //host.Call(typeof(Functions).GetMethod("SendPocoMessage"));
-            //Task.Delay(5000).Wait();
+            host.Call(typeof(Functions).GetMethod("SendPocoMessage"));
+            Task.Delay(5000).Wait();
 
             host.Call(typeof(Functions).GetMethod("SetStringToCache"));
             Task.Delay(5000).Wait();
 
-            host.Call(typeof(Functions).GetMethod("SetPocoToCache"));
+            host.Call(typeof(Functions).GetMethod("SetStringToCacheUsingResolver"));
             Task.Delay(5000).Wait();
 
-            //host.Call(typeof(Functions).GetMethod("AddCacheMessage"));
-            //Task.Delay(5000).Wait();
+            host.Call(typeof(Functions).GetMethod("SetPocoToCache"));
+            Task.Delay(5000).Wait();
 
             Console.CancelKeyPress += (sender, e) =>
             {

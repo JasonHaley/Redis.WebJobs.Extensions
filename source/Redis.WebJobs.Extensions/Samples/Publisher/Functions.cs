@@ -35,13 +35,20 @@ namespace Publisher
 
             log.WriteLine($"Sending Message from SendPubSubMessage(): {message.Id}");
         }
-
+        
         // Cache Examples ***********************************************************************************
         public static void SetStringToCache([Redis("StringKey", Mode.Cache)] out string message, TextWriter log)
         {
             message = "This is a test sent at " + DateTime.UtcNow;
 
             log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
+        }
+
+        public static void SetStringToCacheUsingResolver([Redis("%CacheKey%", Mode.Cache)] out string message, TextWriter log)
+        {
+            message = "This is a test sent using environment variable CacheKey at " + DateTime.UtcNow;
+
+            log.WriteLine($"Adding String to cache from SetStringToCacheUsingResolver(): {message}");
         }
 
         public static void SetPocoToCache([Redis("PocoKey", Mode.Cache)] out Message message, TextWriter log)
