@@ -160,3 +160,4 @@ source/IdentityServer3.sln.GhostDoc.xml
 /source/Redis.WebJobs.Extensions/.vs/config
 /source/Redis.WebJobs.Extensions/Samples/Publisher/Properties/launchSettings.json
 /source/Redis.WebJobs.Extensions/Samples/Subscriber/Properties/launchSettings.json
+/source/Redis.WebJobs.Extensions/.vs/Redis.WebJobs.Extensions/DesignTimeBuild
