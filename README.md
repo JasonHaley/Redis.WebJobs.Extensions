@@ -1,131 +1,228 @@
 # Redis.WebJobs.Extensions
-Utility extensions for using Redis in Azure WebJobs.
+Latest upgrade is to get the project to .NET Standard and ability to run in Azure Functions.
 
-Current implementation borrows heavily from the ServiceBus extensions in the Azure WebJobs SDK.  I'm slowly working on refactoring the implementation.
+This is an extension for using Redis in Azure WebJobs and Functions.
+
+Current implementation borrows heavily from the ServiceBus and CosmosDb extensions in the Azure WebJobs SDK and Azure WebJobs Extensions.  
 
 There are two bindings: Redis and RedisTrigger.
 
 #Redis
-A binding that will publish a message to a Redis Channel.
+Depending on its usage is either an input or output binding that will publish a message to a Redis Channel or get/set a value in the Redis cache.  There is a Mode property that is used to determine if it is to do Pub/Sub or work with the cache.
 
-Example of sending a string message
+These are in WebJobsSamples folder:
+
+Pub/Sub example: output binding that publishes a string message on a given channel
 ```
-public static void SendSimpleMessage([Redis("messages", Mode.PubSub)] out string message, TextWriter log)
+ public static void SendStringMessage(
+    [Redis("pubsub:stringMessages", Mode.PubSub)] out string message, 
+    TextWriter log)
 {
-  message = "this is a test";
+    message = "This is a test";
 
-  log.WriteLine("sending message: " + message);
+    log.WriteLine($"Sending message: {message}");
 }
 ```
 
-Exmple of sending an object that can be serialized with the Newtonsoft.Json serializer.
+Pub/Sub example: output binding that publishes multiple messages on a given channel
 ```
-public static void SendMessage([Redis("messages", Mode.PubSub)] out Message message, TextWriter log)
+public static void SendMultipleStringPubSubMessages(
+    [Redis("pubsub:stringMessages", Mode.PubSub)] IAsyncCollector<string> messages, 
+    TextWriter log)
 {
-  message = new Message
-  {
-    Text = "message #",
-    Sent = DateTime.UtcNow,
-    Id = Guid.NewGuid()
-  };
+    messages.AddAsync("Message 1");
+    messages.AddAsync("Message 2");
+    messages.AddAsync("Message 3");
 
-  log.WriteLine("sending Message: " + message.Id);
+    log.WriteLine($"Sending 3 messages");
 }
 ```
 
-Example of putting a string into a redis cache:
+Pub/Sub example: output binding that publishes a POCO on a given channel
 ```
-public static void ReceiveAndStoreSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message,
-  [Redis("LastSimpleMessage", Mode.Cache)] out string lastMessage, TextWriter log)
+public static void SendPocoMessage(
+    [Redis("pubsub:pocoMessages", Mode.PubSub)] out Message message, 
+    TextWriter log)
 {
-  lastMessage = message;
-  log.WriteLine("Last message received: " + message);
-  log.WriteLine("Storing with key: LastSimpleMessage");
+    message = new Message
+    {
+        Text = "This is a test POCO message",
+        Sent = DateTime.UtcNow,
+        Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
+    };
+
+    log.WriteLine($"Sending Message from SendPubSubMessage(): {message.Id}");
 }
 ```
 
-Example of putting an object into a redis cache:
+Cache example: output binding that sets a string value in the cache for a given key
 ```
-public static void ReceiveAndStoreMessage([RedisTrigger("messages", Mode.PubSub)] Message message,
-  [Redis("LastMessage", Mode.Cache)] out Message lastMessage, TextWriter log)
+public static void SetStringToCache(
+    [Redis("StringKey", Mode.Cache)] out string value, 
+    TextWriter log)
 {
-  lastMessage = message;
-  log.WriteLine("Last message id received: " + message.Id);
-  log.WriteLine("Storing with key: LastMessage");
+    value = "This is a test value at " + DateTime.UtcNow;
+
+    log.WriteLine($"Adding String to cache from SetStringToCache(): {value}");
 }
 ```
 
-Example of retrieving a string value out of a redis cache:
+Cache example: output binding that uses a name resolver to get the cache key to set the
 ```
-public static void GetSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message, 
-  [Redis("LastSimpleMessage", Mode.Cache)] string lastMessage, TextWriter log)
+public static void SetStringToCacheUsingResolver(
+    [Redis("%CacheKey%", Mode.Cache)] out string value, 
+    TextWriter log)
 {
-  log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+    value = "This is a test sent using a name resolver for CacheKey at " + DateTime.UtcNow;
+
+    log.WriteLine($"Adding String to cache from SetStringToCacheUsingResolver(): {value}");
 }
 ```
 
-Example of retrieving an object out of a redis cache:
+Cache example: output binding that sets a POCO objec in the cache for a given key
 ```
-public static void GetMessage([RedisTrigger("messages", Mode.PubSub)] string message, 
-  [Redis("LastMessage", Mode.Cache)] Message lastMessage, TextWriter log)
+public static void SetPocoToCache(
+    [Redis("PocoKey", Mode.Cache)] out Message message, 
+    TextWriter log)
 {
-  log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+    message = new Message
+    {
+        Text = "message #",
+        Sent = DateTime.UtcNow,
+        Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
+    };
+
+    log.WriteLine($"Adding Message to cache from SetPocoToCache(): {message.Id}");
 }
 ```
 
 #RedisTrigger
 This trigger has two modes: 
-PubSub - the trigger will subscribe to a Redis Channel, passing in messages as they are published.
+
+PubSub - the trigger will subscribe to a Redis Channel, passing messages into the function as they are published.
+
 Cache - the trigger will check the value of a redis cache key on a determined TimeSpan frequency and compare the value to the previous checked value and will call function if values are different.  Uses a string compare on json serialized objects.
 
-Example of receiving string messages
+Pub/Sub example: Trigger that listens for string messages
 ```
-public static void ReceiveSimpleMessage([RedisTrigger("messages", Mode.PubSub)] string message)
+public static void ReceiveStringMessage(
+    [RedisTrigger("pubsub:stringMessages", Mode.PubSub)] string message, 
+    TextWriter log)
 {
-    Console.WriteLine("Received Message: {0}", message);
+    log.WriteLine($"--- Received String Message: {message} ---");
 }
 ```
 
-Example of receiving deserialized json objects in message
+Pub/Sub example: Trigger that listens for POCO messages
 ```
-public static void ReceiveMessage([RedisTrigger("messages", Mode.PubSub)] Message message, TextWriter log)
+public static void ReceivePocoMessage(
+    [RedisTrigger("pubsub:pocoMessages")] Message message, 
+    TextWriter log)
 {
-  if (message != null)
-  {
-    log.WriteLine("***ReceivedMessage: {0} Sent: {1}", message.Text, message.Sent);
-  }
-  else
-  {
-    log.WriteLine("***ReceivedMessage: message sent but not compatible withe Message type");
-  }
+
+    if (message != null)
+    {
+        log.WriteLine($"*** Received Poco Message: {message.Text} Sent: {message.Sent} ***");
+    }
+    else
+    {
+        log.WriteLine("*** Received Poco Message: message sent but not compatible withe Message type ***");
+    }
 }
 ```
 
-Example of receiving a string messages when cache value for a given key has changed
+Pub/Sub example: Trigger that listens for POCO message, uses {Id} binding from that messages to set output binding channel to publish string message on.
 ```
-public static void GetCacheTriggerSimpleMessage([RedisTrigger("LastSimpleMessage", Mode.Cache)] string lastMessage, 
-  TextWriter log)
+public static void EchoMessageUsingResolver(
+    [RedisTrigger("pubsub:pocoMessages")] Message message,
+    [Redis("pubsub:{Id}", Mode.PubSub)] IAsyncCollector<string> messages, 
+    TextWriter log)
 {
-  log.WriteLine("LastSimpleMessage retrieved: " + lastMessage);
+    message.Text = "This is a test POCO message ECHO ECHO ECHO";
+    messages.AddAsync(message.Text);
+
+    log.WriteLine($"Sending Message from SendPocoMessageUsingResolver(): {message.Id}");
 }
 ```
 
-Example of receiving a deserialized json object when a cache value for a given key has changed (uses a string comparison to determine value change)
+Pub/Sub example: Trigger that listens to a wildcard channel name
 ```
-public static void GetCacheTriggerMessage([RedisTrigger("LastMessage", Mode.Cache)] Message lastMessage, 
-  TextWriter log)
+public static void ReceiveAllMessages(
+    [RedisTrigger("pubsub:*")] string message, 
+    TextWriter log)
 {
-  log.WriteLine("LastMessage retrieved. Id:" + lastMessage.Id + " Text:" + lastMessage.Text);
+    log.WriteLine($"+++ All Messages: Received Message - {message} +++");
+}
+```
+
+Cache example: Trigger that gets the value of a cache key, value is received if it has changed in the last 30 seconds.  
+- CheckCacheFrequency is set in the RedisConfiguration (default is 30 seconds)
+```
+public static void GetStringCache(
+    [RedisTrigger("StringKey", Mode.Cache)] string lastMessage, 
+    TextWriter log)
+{
+    log.WriteLine($"StringKey retrieved: {lastMessage}");
+}
+```
+
+Cache example: Trigger that gets the value of a cache key as a POCO object, value is received if it has changed in the last 30 seconds.  
+- CheckCacheFrequency is set in the RedisConfiguration (default is 30 seconds)
+```
+public static void GetPocoCache(
+    [RedisTrigger("PocoKey", Mode.Cache)] Message lastMessage, 
+    TextWriter log)
+{
+    log.WriteLine($"PocoKey retrieved. Id: {lastMessage.Id} Text: {lastMessage.Text}");
+}
+```
+
+Cache example: Trigger that gets a cache value using the key from a name resolver
+```
+public static void GetStringCacheUsingNameResolver(
+    [RedisTrigger("%CacheKey%", Mode.Cache)] string lastValue, 
+    TextWriter log)
+{
+    log.WriteLine($"CacheKey name resolver retrieved: {lastValue}");
+}
+```
+
+Cache example: input binding that gets the value of a cache key, uses a TimerTrigger to check
+```
+public static void GetStringValueFromCache(
+    [TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
+    [Redis("StringKey", Mode.Cache)] string message,
+    TextWriter log)
+{
+    log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
+}
+```
+
+Cache example: input/output binding that gets a POCO object from the cache for a key and updates the cache value on exit.  Uses a TimerTigger to check the cache value.
+```
+public static void GetPocoValueFromCache(
+    [TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
+    [Redis("PocoKey", Mode.Cache)] Message message,
+    TextWriter log)
+{
+    counter = +1;
+    message.Text = $"{message.Text}..{counter}";
+
+    log.WriteLine($"Adding String to cache from SetStringToCache(): {message.Text}");
 }
 ```
 
 #NOTE
-You will need to add your Redis and Azure Storage connection information in the App.config's of the Sample publisher and subscriber if you want to run them locally.
+You will need to add your Redis and Azure Storage connection information in the AppSettings in Azure or if using the local development you can add as environment variables or with the function app create a local.settings.config.  Here is a sample to start with for the function app to run locally:
 
 ```
-<connectionStrings>
-  <add name="AzureWebJobsRedis" connectionString="[your redis name].redis.cache.windows.net,ssl=true,password=[your key],allowAdmin=true,connectTimeout=10000,syncTimeout=10000" />
-  <add name="AzureWebJobsDashboard" connectionString="DefaultEndpointsProtocol=https;AccountName=[storage account name];AccountKey=[your storage key]" />
-  <add name="AzureWebJobsStorage" connectionString="DefaultEndpointsProtocol=https;AccountName=[storage account name];AccountKey=[your storage key]" />
-</connectionStrings>
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsEnv": "Development",
+        "AzureWebJobsRedisConnectionString": "[your redis db].redis.cache.windows.net:6380,password=[your password]],ssl=True,abortConnect=False",
+        "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=[your storage account];AccountKey=[your account key];EndpointSuffix=core.windows.net",
+        "AzureWebJobsDashboard": "DefaultEndpointsProtocol=https;AccountName=[your storage account];AccountKey=[your account key];EndpointSuffix=core.windows.net"
+    }
+}
 ```
