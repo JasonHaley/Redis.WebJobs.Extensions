@@ -25,7 +25,8 @@ namespace Redis.WebJobs.Extensions.Framework
         {
             get { return typeof(TInput); }
         }
-        
+
+        public abstract object GetValue();
         public abstract Task<object> GetValueAsync();
 
         /// <inheritdoc/>
@@ -54,5 +55,6 @@ namespace Redis.WebJobs.Extensions.Framework
                 return false;
             }
         }
+        
     }
 }

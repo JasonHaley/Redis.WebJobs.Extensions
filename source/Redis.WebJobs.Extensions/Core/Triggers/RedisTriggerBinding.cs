@@ -16,8 +16,10 @@ namespace Redis.WebJobs.Extensions.Triggers
 {
     internal class RedisTriggerBinding : ITriggerBinding
     {
+        private readonly RedisTriggerAttribute _attribute;
         private readonly ParameterInfo _parameter;
-        private readonly IBindingDataProvider _bindingDataProvider;
+        private readonly BindingDataProvider _bindingDataProvider;
+        private readonly IReadOnlyDictionary<string, Type> _bindingContract;
         private readonly string _channelOrKey;
         private readonly Mode _mode;
         private readonly RedisConfiguration _config;
@@ -29,7 +31,10 @@ namespace Redis.WebJobs.Extensions.Triggers
             _channelOrKey = channelOrKey;
             _mode = mode;
             _config = config;
-            _bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
+            //_bindingDataProvider = BindingDataProvider.FromType(parameter.ParameterType);
+            _attribute = parameter.GetCustomAttribute<RedisTriggerAttribute>(inherit: false);
+            _bindingDataProvider = BindingDataProvider.FromTemplate(_attribute.ChannelOrKey);
+            //_bindingContract = CreateBindingContract();
             _trace = trace;
         }
         
@@ -41,18 +46,34 @@ namespace Redis.WebJobs.Extensions.Triggers
 
         public Mode Mode => _mode;
 
-        public async Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
+        public Task<ITriggerData> BindAsync(object value, ValueBindingContext context)
         {
             IValueProvider provider = new JsonValueProvider(value, _parameter.ParameterType);
 
-            var providerVal = await provider.GetValueAsync();
+            var providerVal = provider.GetValue();
             var bindingData = _bindingDataProvider?.GetBindingData(providerVal);
 
             var result = new TriggerData(provider, bindingData);
 
-            return result;
+            return Task.FromResult< ITriggerData>(result);
         }
-        
+        //private IReadOnlyDictionary<string, Type> CreateBindingContract()
+        //{
+        //    Dictionary<string, Type> contract = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        //    //contract.Add("FileTrigger", typeof(FileSystemEventArgs));
+
+        //    if (_bindingDataProvider.Contract != null)
+        //    {
+        //        foreach (KeyValuePair<string, Type> item in _bindingDataProvider.Contract)
+        //        {
+        //            // In case of conflict, binding data from the value type overrides the built-in binding data above.
+        //            contract[item.Key] = item.Value;
+        //        }
+        //    }
+
+        //    return contract;
+        //}
+
         public Task<IListener> CreateListenerAsync(ListenerFactoryContext context)
         {
             if (context == null)

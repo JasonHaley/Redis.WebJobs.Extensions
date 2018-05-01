@@ -156,3 +156,4 @@ $RECYCLE.BIN/
 distribution/
 *_NCrunch_*
 source/IdentityServer3.sln.GhostDoc.xml
+/source/Redis.WebJobs.Extensions/.vs/Redis.WebJobs.Extensions/v15/Server/sqlite3

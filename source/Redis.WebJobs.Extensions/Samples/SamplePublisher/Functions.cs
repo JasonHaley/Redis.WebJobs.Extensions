@@ -8,25 +8,25 @@ namespace SamplePublisher
     public static class Functions
     {
         // PubSub Examples ***********************************************************************************
-        public static void SendSimplePubSubMessage([Redis("pubsub:simpleMessages", Mode.PubSub)] out string message, TextWriter log, TraceWriter trace)
-        {
-            message = "This is a test";
+        //public static void SendSimplePubSubMessage([Redis("pubsub:simpleMessages", Mode.PubSub)] out string message, TextWriter log, TraceWriter trace)
+        //{
+        //    message = "This is a test";
 
-            log.WriteLine($"Sending message: {message}");
+        //    log.WriteLine($"Sending message: {message}");
 
-            trace.Info($"New message sent SendSimplePubSubMessage(): {message}");
-        }
-        public static void SendPubSubMessage([Redis("pubsub:messages", Mode.PubSub)] out Message message, TextWriter log)
-        {
-            message = new Message
-            {
-                Text = "message #",
-                Sent = DateTime.UtcNow,
-                Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
-            };
+        //    trace.Info($"New message sent SendSimplePubSubMessage(): {message}");
+        //}
+        //public static void SendPubSubMessage([Redis("pubsub:messages", Mode.PubSub)] out Message message, TextWriter log)
+        //{
+        //    message = new Message
+        //    {
+        //        Text = "message #",
+        //        Sent = DateTime.UtcNow,
+        //        Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
+        //    };
 
-            log.WriteLine($"Sending Message from SendPubSubMessage(): {message.Id}");
-        }
+        //    log.WriteLine($"Sending Message from SendPubSubMessage(): {message.Id}");
+        //}
 
         public static void SendPubSubMessageIdChannel([Redis("pubsub:messages:{Id}", Mode.PubSub)] out Message message, TextWriter log)
         {
@@ -41,36 +41,36 @@ namespace SamplePublisher
         }
 
         // Cache Examples ***********************************************************************************
-        public static void AddSimpleCacheMessage([Redis("LastSimpleMessage", Mode.Cache)] out string message, TextWriter log)
-        {
-            message = "This is a test";
+        //public static void AddSimpleCacheMessage([Redis("LastSimpleMessage", Mode.Cache)] out string message, TextWriter log)
+        //{
+        //    message = "This is a test";
 
-            log.WriteLine($"Adding Message to cache from AddSimpleCacheMessage(): {message}");
-        }
+        //    log.WriteLine($"Adding Message to cache from AddSimpleCacheMessage(): {message}");
+        //}
 
-        public static void AddCacheLastMessage([Redis("LastMessage", Mode.Cache)] out Message message, TextWriter log)
-        {
-            message = new Message
-            {
-                Text = "message #",
-                Sent = DateTime.UtcNow,
-                Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
-            };
+        //public static void AddCacheLastMessage([Redis("LastMessage", Mode.Cache)] out Message message, TextWriter log)
+        //{
+        //    message = new Message
+        //    {
+        //        Text = "message #",
+        //        Sent = DateTime.UtcNow,
+        //        Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
+        //    };
 
-            log.WriteLine($"Adding Message to cache from AddCacheLastMessage(): {message.Id}");
-        }
+        //    log.WriteLine($"Adding Message to cache from AddCacheLastMessage(): {message.Id}");
+        //}
 
-        public static void AddCacheMessage([Redis("LastMessage:{Id}", Mode.Cache)] out Message message, TextWriter log)
-        {
-            message = new Message
-            {
-                Text = "message #",
-                Sent = DateTime.UtcNow,
-                Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
-            };
+        //public static void AddCacheMessage([Redis("LastMessage:{Id}", Mode.Cache)] out Message message, TextWriter log)
+        //{
+        //    message = new Message
+        //    {
+        //        Text = "message #",
+        //        Sent = DateTime.UtcNow,
+        //        Id = Guid.Parse("bc3a6131-937c-4541-a0cf-27d49b96a5f2")
+        //    };
 
-            log.WriteLine($"Adding Message to cache from AddCacheMessage(): {message.Id}");
-        }
+        //    log.WriteLine($"Adding Message to cache from AddCacheMessage(): {message.Id}");
+        //}
 
         public class Message
         {

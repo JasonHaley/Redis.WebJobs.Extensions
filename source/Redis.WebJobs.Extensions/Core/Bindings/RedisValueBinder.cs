@@ -14,25 +14,28 @@ namespace Redis.WebJobs.Extensions.Bindings
         {
             _entity = entity;
         }
-
-        public override Task<object> GetValueAsync()
+        public override object GetValue()
         {
             string value = _entity.GetAsync().Result;
 
             if (value == null)
             {
-                return Task.FromResult<object>(default(TInput));
+                return default(TInput);
             }
 
             TInput contents;
             if (TryJsonConvert(value, out contents))
             {
-                return Task.FromResult<object>(contents);
+                return contents;
             }
             else
             {
-                return Task.FromResult<object>(value);
+                return value;
             }
+        }
+        public override Task<object> GetValueAsync()
+        {
+            return Task.FromResult(GetValue());
         }
         
         public override string ToInvokeString()
