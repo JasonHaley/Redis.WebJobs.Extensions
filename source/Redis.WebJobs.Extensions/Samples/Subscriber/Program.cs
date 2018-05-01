@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Redis.WebJobs.Extensions;
+using System;
 
 namespace Subscriber
 {
@@ -12,7 +13,10 @@ namespace Subscriber
 
             config.NameResolver = new NameResolver();
 
-            config.UseRedis();
+            var redisConfig = new RedisConfiguration();
+            redisConfig.CheckCacheFrequency = TimeSpan.FromSeconds(10);
+
+            config.UseRedis(redisConfig);
             
             config.UseTimers();
 

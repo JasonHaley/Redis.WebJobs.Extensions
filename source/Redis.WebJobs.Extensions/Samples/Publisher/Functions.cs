@@ -8,14 +8,21 @@ namespace Publisher
     public static class Functions
     {
         // PubSub Examples ***********************************************************************************
-        public static void SendStringMessage([Redis("pubsub:stringMessages", Mode.PubSub)] out string message, TextWriter log)
+
+        // Pub/Sub example: output binding that publishes a string message on a given channel
+        public static void SendStringMessage(
+            [Redis("pubsub:stringMessages", Mode.PubSub)] out string message, 
+            TextWriter log)
         {
             message = "This is a test";
 
             log.WriteLine($"Sending message: {message}");
         }
 
-        public static void SendMultipleStringPubSubMessages([Redis("pubsub:stringMessages", Mode.PubSub)] IAsyncCollector<string> messages, TextWriter log)
+        // Pub/Sub example: output binding that publishes multiple messages on a given channel
+        public static void SendMultipleStringPubSubMessages(
+            [Redis("pubsub:stringMessages", Mode.PubSub)] IAsyncCollector<string> messages, 
+            TextWriter log)
         {
             messages.AddAsync("Message 1");
             messages.AddAsync("Message 2");
@@ -24,7 +31,10 @@ namespace Publisher
             log.WriteLine($"Sending 3 messages");
         }
 
-        public static void SendPocoMessage([Redis("pubsub:pocoMessages", Mode.PubSub)] out Message message, TextWriter log)
+        // Pub/Sub example: output binding that publishes a POCO on a given channel
+        public static void SendPocoMessage(
+            [Redis("pubsub:pocoMessages", Mode.PubSub)] out Message message, 
+            TextWriter log)
         {
             message = new Message
             {
@@ -37,21 +47,32 @@ namespace Publisher
         }
         
         // Cache Examples ***********************************************************************************
-        public static void SetStringToCache([Redis("StringKey", Mode.Cache)] out string message, TextWriter log)
+        
+        // Cache example: output binding that sets a string value in the cache for a given key
+        public static void SetStringToCache(
+            [Redis("StringKey", Mode.Cache)] out string value, 
+            TextWriter log)
         {
-            message = "This is a test sent at " + DateTime.UtcNow;
+            value = "This is a test value at " + DateTime.UtcNow;
 
-            log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
+            log.WriteLine($"Adding String to cache from SetStringToCache(): {value}");
         }
 
-        public static void SetStringToCacheUsingResolver([Redis("%CacheKey%", Mode.Cache)] out string message, TextWriter log)
+        // Cache example: output binding that uses a name resolver to get the cache key to set the
+        //    string value to
+        public static void SetStringToCacheUsingResolver(
+            [Redis("%CacheKey%", Mode.Cache)] out string value, 
+            TextWriter log)
         {
-            message = "This is a test sent using environment variable CacheKey at " + DateTime.UtcNow;
+            value = "This is a test sent using a name resolver for CacheKey at " + DateTime.UtcNow;
 
-            log.WriteLine($"Adding String to cache from SetStringToCacheUsingResolver(): {message}");
+            log.WriteLine($"Adding String to cache from SetStringToCacheUsingResolver(): {value}");
         }
 
-        public static void SetPocoToCache([Redis("PocoKey", Mode.Cache)] out Message message, TextWriter log)
+        // Cache example: output binding that sets a POCO objec in the cache for a given key
+        public static void SetPocoToCache(
+            [Redis("PocoKey", Mode.Cache)] out Message message, 
+            TextWriter log)
         {
             message = new Message
             {
