@@ -194,13 +194,13 @@ public static void GetStringValueFromCache(
     [Redis("StringKey", Mode.Cache)] string message,
     TextWriter log)
 {
-    log.WriteLine($"Adding String to cache from SetStringToCache(): {message}");
+    log.WriteLine($"Getting String in cache from GetStringValueFromCache(): {message}");
 }
 ```
 
 Cache example: input/output binding that gets a POCO object from the cache for a key and updates the cache value on exit.  Uses a TimerTigger to check the cache value.
 ```
-public static void GetPocoValueFromCache(
+public static void GetSetPocoValueFromCache(
     [TimerTrigger("00:01", RunOnStartup = true)] TimerInfo timer,
     [Redis("PocoKey", Mode.Cache)] Message message,
     TextWriter log)
@@ -208,7 +208,7 @@ public static void GetPocoValueFromCache(
     counter = +1;
     message.Text = $"{message.Text}..{counter}";
 
-    log.WriteLine($"Adding String to cache from SetStringToCache(): {message.Text}");
+    log.WriteLine($"Getting and Setting Poco in cache from GetSetPocoValueFromCache(): {message.Text}");
 }
 ```
 
